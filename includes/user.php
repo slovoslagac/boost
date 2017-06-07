@@ -9,7 +9,6 @@
 class user
 {
     private $name;
-    private $lastname;
     private $username;
     private $email;
     private $password;
@@ -18,10 +17,9 @@ class user
     private $status = 1;
 
 
-    public function __construct($name, $ln, $un, $em, $ps, $ggun, $ggps)
+    public function __construct($name, $un, $em, $ps, $ggun, $ggps)
     {
         $this->name = $name;
-        $this->lastname = $ln;
         $this->username = $un;
         $this->email = $em;
         $this->password = $ps;
@@ -35,9 +33,8 @@ class user
 
     public function addnewuser() {
         global $conn;
-        $sql = $conn->prepare("insert into users(name, lastname, username, email, password, ggusername, ggpassword, status) values (:nm, :ln, :un, :em, :ps, :ggun, :ggps, :st)");
+        $sql = $conn->prepare("insert into users(name, username, email, password, ggusername, ggpassword, status) values (:nm, :un, :em, :ps, :ggun, :ggps, :st)");
         $sql->bindParam(":nm", $this->name);
-        $sql->bindParam(":ln", $this->lastname);
         $sql->bindParam(":un", $this->username);
         $sql->bindParam(":em", $this->email);
         $sql->bindParam(":ps", $this->password);

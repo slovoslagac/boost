@@ -2,9 +2,9 @@
 include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 
 
-if (isset($_POST["saveuser"]) and $_POST["name"] != '' and $_POST["lastname"] != '' and $_POST["username"] != '') {
+if (isset($_POST["saveuser"]) and $_POST["name"] != ''  and $_POST["username"] != '') {
   if ($_POST["password"] == $_POST["passwordagain"]) {
-    $user = new user($_POST["name"], $_POST["lastname"], $_POST["username"], $_POST["email"], crypt($_POST["password"], $salt), $_POST["gguname"], $_POST["ggpassword"]);
+    $user = new user($_POST["name"], $_POST["username"], $_POST["email"], crypt($_POST["password"], $salt), $_POST["gguname"], $_POST["ggpassword"]);
     $user->addnewuser();
   }
 }
@@ -23,46 +23,46 @@ include $headLayout;
   <div class="register-box-body">
     <p class="login-box-msg">Registracija novog boostera</p>
 
-    <form action="index.php" method="post">
+    <form action="<?php echo $_SERVER["PHP_SELF"] ;?> method="post">
       <div class="form-group has-feedback">
-        <input type="text" class="form-control" placeholder="Ime i prezime" name="name">
+        <input type="text" class="form-control" placeholder="Ime i prezime" name="name" required>
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="email" class="form-control" placeholder="Email">
+        <input type="email" class="form-control" placeholder="Email" name="email" required>
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="email" class="form-control" placeholder="Username">
+        <input type="text" class="form-control" placeholder="Username" name="username" required>
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" placeholder="Password">
+        <input type="password" class="form-control" placeholder="Password" id="password" name="password" required onchange="checkinsert()">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" placeholder="Retype password">
+        <input type="password" class="form-control" placeholder="Retype password" id="passwordagain" name="passwordagain" required onchange="checkinsert()">
         <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="email" class="form-control" placeholder="GGBoost username">
+        <input type="text" class="form-control" placeholder="GGBoost username" name="gguname" required>
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>    
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" placeholder="GGBoost password">
+        <input type="password" class="form-control" placeholder="GGBoost password" name="ggpassword" required>
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>    
       <div class="row">
         <div class="col-xs-8">
           <div class="checkbox icheck">
             <label>
-              <input type="checkbox"> Prihvatam <a href="rules.html">pravila korišćenja</a>
+              <input type="checkbox" required> Prihvatam <a href="rules.html">pravila korišćenja</a>
             </label>
           </div>
         </div>
         <!-- /.col -->
         <div class="col-xs-4">
-          <button type="submit" class="btn btn-primary btn-block btn-flat">Registruj se</button>
+          <button type="submit" class="btn btn-primary btn-block btn-flat" id="saveuser" name="saveuser" disabled>Registruj se</button>
         </div>
         <!-- /.col -->
       </div>
