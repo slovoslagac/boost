@@ -1,32 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Boost Room - logovanje</title>
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="plugins/iCheck/square/blue.css">
+<?php
+include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+if ($session->isLoggedIn()) {
+    redirectTo("index.php");
+}
 
-    <!-- Google Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-</head>
+if (isset($_POST["checklogin"]) ) {
+    $currentuser = getuserbyusername($_POST["username"]);
+    if (crypt($_POST["password"],$salt) == $currentuser->password) {
+        $session->login($currentuser);
+        redirectTo("index.php");
+
+    } else {
+        echo "Losa lozinka!!!";
+    }
+}
+
+include $headLayout;
+
+?>
 <body class="hold-transition login-page">
 <div class="login-box">
     <div class="login-logo">
@@ -36,13 +28,13 @@
     <div class="login-box-body">
         <p class="login-box-msg">Uloguj se</p>
 
-        <form action="index2.html" method="post">
+        <form form method="post" action="<?php echo $_SERVER["PHP_SELF"] ?>">
             <div class="form-group has-feedback">
-                <input type="email" class="form-control" placeholder="Email">
+                <input type="text" class="form-control" placeholder="Username" name="username" required>
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
             </div>
             <div class="form-group has-feedback">
-                <input type="password" class="form-control" placeholder="Password">
+                <input type="password" class="form-control" placeholder="Password" name="password" required>
                 <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
             <div class="row">
@@ -52,7 +44,7 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-xs-4">
-                    <button type="submit" class="btn btn-primary btn-block btn-flat">Uloguj se</button>
+                    <button type="submit" class="btn btn-primary btn-block btn-flat" name="checklogin">Uloguj se</button>
                 </div>
                 <!-- /.col -->
             </div>

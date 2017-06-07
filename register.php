@@ -23,7 +23,7 @@ include $headLayout;
   <div class="register-box-body">
     <p class="login-box-msg">Registracija novog boostera</p>
 
-    <form action="<?php echo $_SERVER["PHP_SELF"] ;?> method="post">
+    <form action="<?php echo $_SERVER["PHP_SELF"] ;?>" method="post">
       <div class="form-group has-feedback">
         <input type="text" class="form-control" placeholder="Ime i prezime" name="name" required>
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
