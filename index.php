@@ -8,27 +8,50 @@ if (!$session->isLoggedIn()) {
 $allservers = getAllServers();
 $allranks = getAllRanks();
 $allorders = getDetailedOrders();
-
-
+$ranksTranslation = getRanksTranslate();
 $serverName = array();
 foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
 
 
+$currentuser = getuserbyuserid($session->userid);
+$earnings = getSallaryByPlayer($session->userid);
+
+if ($earnings != '') {
+    $erningsrate = $earnings->profit / $earnings->days;
+    $currentearnings = $earnings->profit;
+} else {
+    $erningsrate = 0;
+    $currentearnings = 0;
+}
 
 if(isset($_POST["saveorder"])){
+
     $serverid = $_POST["optionsRadios"];
     $server = $serverName[$serverid];
     $boostuser = $_POST["boostusername"];
     $currentsummoner = getSummonerDetails($server, $boostuser);
-    $startdiv = $_POST["startdivison"];
-    $enddiv = $_POST["enddivision"];
-    $lppoints = $_POST["lppoint"];
-    $price = $_POST["boostprice"];
-    $currentorder = new orders($session->userid,$currentsummoner->id,$serverid,$startdiv,$enddiv,$lppoints, $price);
-    $currentorder->addorder();
+    if($currentsummoner != false) {
+        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid);
+        $autopoints = $currentsummonerranking->leaguePoints;
+        $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
+        $currentdiv = $ranksTranslation[$tmpvar];
+        $startdiv = $_POST["startdivison"];
+        $enddiv = $_POST["enddivision"];
+        $lppoints = $_POST["lppoint"];
+        $price = $_POST["boostprice"];
 
+        try {
+            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints);
+            $currentorder->addorder();
+
+        } catch (Exception $e) {
+            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints", 'error.txt');
+        }
+    }
+
+    header("Location:index.php");
 
 }
 
@@ -65,7 +88,7 @@ include $headLayout;
                             <!-- The user image in the navbar-->
                             <img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
                             <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                            <span class="hidden-xs">Konstantin Stikić</span>
+                            <span class="hidden-xs"><?php echo $currentuser->name ?></span>
                         </a>
                         <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
@@ -73,8 +96,8 @@ include $headLayout;
                                 <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                                 <p>
-                                    Konstantin Stikić - Booster
-                                    <small>Member since Jun. 2017</small>
+                                    <?php echo $currentuser->name ?> - Booster
+                                    <small>Member since <?php $new_datetime = DateTime::createFromFormat ( "Y-m-d H:i:s", $currentuser->create_time ); echo $new_datetime->format('M, Y'); ;?></small>
                                 </p>
                             </li>
                             <!-- Menu Body -->
@@ -138,7 +161,7 @@ include $headLayout;
                                 <div class="modal-body">
                                     <div class="form-group">
                                         <label for="boostusername">Username accounta</label>
-                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije">
+                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije" required>
                                     </div>
                                     <hr>
                                     <label for="exampleInputEmail1">Server</label>
@@ -158,7 +181,7 @@ include $headLayout;
                                     <hr>
                                     <div class="form-group">
                                         <label>Početna divizija</label>
-                                        <select class="form-control" name="startdivison">
+                                        <select class="form-control" name="startdivison" required>
                                            <?php foreach ($allranks as $item) { ?>
                                                <option value="<?php echo $item->id?>"><?php echo $item->name?></option>
                                            <?php }?>
@@ -166,11 +189,11 @@ include $headLayout;
                                     </div>
                                     <div class="form-group">
                                         <label for="lppoint">Broj LP poena</label>
-                                        <input type="text" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku">
+                                        <input type="text" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Krajnja divizija</label>
-                                        <select class="form-control" name="enddivision">
+                                        <select class="form-control" name="enddivision" required>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id?>"><?php echo $item->name?></option>
                                             <?php }?>
@@ -179,7 +202,7 @@ include $headLayout;
                                     <hr>
                                     <div class="form-group">
                                         <label for="boostprice">Cena ordera</label>
-                                        <input type="text" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta">
+                                        <input type="text" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -208,13 +231,15 @@ include $headLayout;
                             <th></th>
 
                         </tr>
-                        <?php $i=1; foreach($allorders as $item) {?>
+                        <?php $i=1; foreach($allorders as $item) {
+                            if($item->playerid == $session->userid) {
+                            ?>
                             <tr>
                                 <td style="line-height:32px; text-align:center; width:10px;"><?php echo "$i."?></td>
                                 <td style="line-height:32px;"><b><?php echo $item->name;?></b></td>
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server;?></td>
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->start ($item->points)";?></td>
-                                <td style="line-height:32px; text-align:center; width:70px;">D4 (14)</td>
+                                <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '')? $item->cp : $item->ap ; echo "$item->cr ($tmppoint)";?></td>
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end";?></td>
                                 <td style="line-height:32px; text-align:center; width:94px;">12/1 (90%)</td>
                                 <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price €";?></span></td>
@@ -228,7 +253,7 @@ include $headLayout;
                             </tr>
 
 
-                        <?php $i++;} ?>
+                        <?php $i++;} }?>
 
                     </table>
                 </div>
@@ -264,9 +289,9 @@ include $headLayout;
             <div class="box box-widget widget-user">
                 <!-- Add the bg color to the header using any of the bg-* classes -->
                 <div class="widget-user-header bg-aqua-active">
-                    <h3 class="widget-user-username">Konstantin Stikić</h3>
-                    <h5 class="widget-user-desc">Saintsu</h5>
-                    <div class="zarada">47€</div>
+                    <h3 class="widget-user-username"><?php echo $currentuser->name ?></h3>
+                    <h5 class="widget-user-desc"><?php echo $currentuser->username ?></h5>
+                    <div class="zarada"><?php  echo "$currentearnings €"?></div>
                 </div>
                 <div class="widget-user-image">
                     <img class="img-circle" src="dist/img/user1-128x128.jpg" alt="User Avatar">
@@ -275,7 +300,7 @@ include $headLayout;
                     <div class="row">
                         <div class="col-sm-4 border-right">
                             <div class="description-block">
-                                <h5 class="description-header">30/60</h5>
+                                <h5 class="description-header">N/A</h5>
                                 <span class="description-text">GEJMOVI</span>
                             </div>
                             <!-- /.description-block -->
@@ -283,7 +308,7 @@ include $headLayout;
                         <!-- /.col -->
                         <div class="col-sm-4 border-right">
                             <div class="description-block">
-                                <h5 class="description-header">50%</h5>
+                                <h5 class="description-header">N/A</h5>
                                 <span class="description-text">WIN RATE</span>
                             </div>
                             <!-- /.description-block -->
@@ -291,7 +316,7 @@ include $headLayout;
                         <!-- /.col -->
                         <div class="col-sm-4">
                             <div class="description-block">
-                                <h5 class="description-header">35€/dan</h5>
+                                <h5 class="description-header"><?php  echo "$erningsrate €/dan"?></h5>
                                 <span class="description-text">ZARADA</span>
                             </div>
                             <!-- /.description-block -->
@@ -334,56 +359,12 @@ include $headLayout;
                 <!-- /.box-header -->
                 <div class="box-body no-padding">
                     <table class="table table-condensed">
-                        <tr>
-                            <th style="width: 20px">#</th>
-                            <th>Booster</th>
-                            <th style="width: 40px">€</th>
-                        </tr>
-                        <tr>
-                            <td>1.</td>
-                            <td>Shy</td>
-                            <td><span class="badge bg-red">117€</span></td>
-                        </tr>
-                        <tr>
-                            <td>2.</td>
-                            <td>Sima</td>
-                            <td><span class="badge bg-red">98€</span></td>
-                        </tr>
-                        <tr>
-                            <td>3.</td>
-                            <td>Palamudin</td>
-                            <td><span class="badge bg-red">93€</span></td>
-                        </tr>
-                        <tr>
-                            <td>4.</td>
-                            <td>Glisha</td>
-                            <td><span class="badge bg-red">88€</span></td>
-                        </tr>
-                        <tr>
-                            <td>5.</td>
-                            <td>Matija</td>
-                            <td><span class="badge bg-red">54€</span></td>
-                        </tr>
-                        <tr>
-                            <td>6.</td>
-                            <td>Saintsu</td>
-                            <td><span class="badge bg-red">23€</span></td>
-                        </tr>
-                        <tr>
-                            <td>7.</td>
-                            <td>Bang</td>
-                            <td><span class="badge bg-red">21€</span></td>
-                        </tr>
-                        <tr>
-                            <td>8.</td>
-                            <td>Rengar</td>
-                            <td><span class="badge bg-red">10€</span></td>
-                        </tr>
-                        <tr>
-                            <td>6.</td>
-                            <td>Saintsu</td>
-                            <td><span class="badge bg-red">23€</span></td>
-                        </tr>
+<!--                        <tr>-->
+<!--                            <th style="width: 20px">#</th>-->
+<!--                            <th>Booster</th>-->
+<!--                            <th style="width: 40px">€</th>-->
+<!--                        </tr>-->
+
 
                     </table>
                 </div>

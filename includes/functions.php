@@ -85,27 +85,22 @@ function getAllRanks(){
     return $result;
 }
 
-function getSummonerDetails($server, $summonername){
-    $fullData = file_get_contents("https://$server.api.riotgames.com/lol/summoner/v3/summoners/by-name/$summonername?api_key=d3695a41-c367-41e6-9abf-cf6a90ea8d6d");
-    $playerDecoded = json_decode($fullData);
 
-    $newsummoner = new summoners($playerDecoded->id, $playerDecoded->accountId, $playerDecoded->name, $playerDecoded->profileIconId, $playerDecoded->revisionDate, $playerDecoded->summonerLevel);
-    $boostuser = $newsummoner->checkIfSummonerExists();
-    if ( $boostuser == '') {
-        $newsummoner->addNewSummoner();
-        $boostuser = $newsummoner->checkIfSummonerExists();
-    }
-    return $boostuser;
-}
 
 function getDetailedOrders() {
     global $conn;
-    $sql = $conn->prepare("select s.name, srv.shortname as server, r.shortname start, o.points, e.shortname as end, o.price as price, round(0.6*o.price) as profit, o.status
+    $sql = $conn->prepare("select p.name, p.server, p.start, p.points, p.end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid
+from
+(
+select s.name, srv.shortname as server, r.shortname start, o.points, e.shortname as end, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap, o.playerid
 from orders o, apisummoners s, servers srv, ranks r, ranks e
 where o.boostusername = s.id
 and o.server = srv.id
 and o.startdiv = r.id
-and o.enddiv = e.id");
+and o.enddiv = e.id
+) p
+left join ranks cr on  p.currentdiv = cr.id
+");
     $sql->execute();
     $result = $sql->fetchAll(PDO::FETCH_OBJ);
     return $result;

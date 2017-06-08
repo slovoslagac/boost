@@ -1,5 +1,6 @@
 insert into servers(name,shortname,shortname2) values ('Europe West','EUW','euw1'),('Europe North East','EUN','eun1'),('North America','NA','na1')
 
+insert into ranks (name, `order`, shortname) values
 ('Bronze 1',23,'B1'),
 ('Bronze 2',24,'B2'),
 ('Bronze 3',25,'B3'),

@@ -13,6 +13,7 @@ require INC_PATH . DS . 'config.php';
 require INC_PATH . DS . 'user.php';
 require INC_PATH . DS . 'db.php';
 require INC_PATH . DS . 'functions.php';
+require INC_PATH . DS . 'apifunctions.php';
 require INC_PATH . DS . 'session.php';
 require INC_PATH . DS . 'summoners.php';
 require INC_PATH . DS . 'orders.php';

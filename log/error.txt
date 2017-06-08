@@ -1,0 +1,10 @@
+08.06.2017 13:59:16 | Problem sa dohvatanjem podataka sa API-a : server :eun1, bostuser :misternixxx, bostuserid = 
+08.06.2017 13:59:16 | Problem sa kreiranjem ponude : 2, , 2, , , , , , 
+08.06.2017 14:09:49 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx, , , , , , 
+08.06.2017 14:09:55 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx, , , , , , 
+08.06.2017 14:10:32 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
+08.06.2017 14:10:45 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
+08.06.2017 14:11:15 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
+08.06.2017 14:11:15 | Problem sa kreiranjem ponude : 2, , 2, 1, 1, 50, 50, , 
+08.06.2017 14:13:14 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
+08.06.2017 14:15:23 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,

@@ -6,6 +6,7 @@ if (isset($_POST["saveuser"]) and $_POST["name"] != ''  and $_POST["username"] !
   if ($_POST["password"] == $_POST["passwordagain"]) {
     $user = new user($_POST["name"], $_POST["username"], $_POST["email"], crypt($_POST["password"], $salt), $_POST["gguname"], $_POST["ggpassword"]);
     $user->addnewuser();
+    redirectTo("login.php");
   }
 }
 
