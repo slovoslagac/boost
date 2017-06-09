@@ -18,9 +18,11 @@ class orders
     private $price;
     private $status = 0;
     private $autopoints;
+    private $ordertype;
+    private $currency = 1;
 
 
-    public function __construct($userid, $sumid, $srvid, $sdiv, $ediv, $points, $price, $cdiv, $ap)
+    public function __construct($userid, $sumid, $srvid, $sdiv, $ediv, $points, $price, $cdiv, $ap, $ord, $cur)
     {
         $this->userid = $userid;
         $this->summonerid = $sumid;
@@ -31,22 +33,27 @@ class orders
         $this->startpoints = $points;
         $this->price = $price;
         $this->autopoints = $ap;
+        $this->ordertype = $ord;
+        $this->currency = $cur;
     }
 
     public function addorder()
     {
         global $conn;
-        $sql=$conn->prepare("insert into orders (boostusername,server,startdiv, currentdiv,enddiv,points,price,status,playerid, autopoints) values (:bu,:sr,:sd,:cd,:ed,:po,:pr,:st,:pl,:ap)");
-        $sql->bindParam(":bu",$this->summonerid);
-        $sql->bindParam(":sr",$this->serverid);
-        $sql->bindParam(":sd",$this->startdiv);
-        $sql->bindParam(":cd",$this->currentdiv);
-        $sql->bindParam(":ed",$this->enddiv);
-        $sql->bindParam(":po",$this->startpoints);
-        $sql->bindParam(":pr",$this->price);
-        $sql->bindParam(":st",$this->status);
-        $sql->bindParam(":pl",$this->userid);
-        $sql->bindParam(":ap",$this->autopoints);
+        $sql = $conn->prepare("insert into orders (boostusername,server,startdiv, currentdiv,enddiv,points,price,status,playerid, autopoints,ordertype, currency )
+                                values (:bu,:sr,:sd,:cd,:ed,:po,:pr,:st,:pl,:ap, :ot, :cr)");
+        $sql->bindParam(":bu", $this->summonerid);
+        $sql->bindParam(":sr", $this->serverid);
+        $sql->bindParam(":sd", $this->startdiv);
+        $sql->bindParam(":cd", $this->currentdiv);
+        $sql->bindParam(":ed", $this->enddiv);
+        $sql->bindParam(":po", $this->startpoints);
+        $sql->bindParam(":pr", $this->price);
+        $sql->bindParam(":st", $this->status);
+        $sql->bindParam(":pl", $this->userid);
+        $sql->bindParam(":ap", $this->autopoints);
+        $sql->bindParam(":ot", $this->ordertype);
+        $sql->bindParam(":cr", $this->currency);
         $sql->execute();
     }
 

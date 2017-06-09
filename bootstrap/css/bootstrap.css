@@ -2641,12 +2641,13 @@ input[type="search"] {
 }
 .radio label,
 .checkbox label {
-  min-height: 20px;
+  min-height: 30px;
   padding-left: 20px;
   margin-bottom: 0;
   font-weight: normal;
   cursor: pointer;
-  margin-right:30px;
+  margin-right:10px;
+  font-size:12px;
 }
 .radio input[type="radio"],
 .radio-inline input[type="radio"],

@@ -12,3 +12,13 @@ Dodatne opcije:
 1. Dobije novac za posao koji je odradio
 2. Ne dobije novac i oduzme mu se posao
 3. Bude kaznjen i dobije penale
+
+
+
+Tipovi obracuna :
+1. Solo -  ovo sto sada imamo
+2. Duo je isto kao i solo, samo sto ne igra sam, nego igra zajedno sa musterijom.
+    Sto se obracuna tice isto, mozda treba samo da dodamo polje da nam kaze sa kojim nalogom ce on igrati, da eventualno pratimo i taj nalog.
+3. Flex je isto kao solo, ali onda gledamo onaj drugi, Flex rank, a ne Solo
+4. Normal gejmovi - oni nemaju rank uopste, nego se igraju samo normal gejmovi (moram da vidim sta se tu pravi)
+5. Net wins - neko plati 10 pobjeda...igrac igra sve dok nema 10 cistih pobjeda. Znaci 10-0 idealno, ali ako izgubi neku, onda mora jos da igra... 11-1, 12-2 i sl...

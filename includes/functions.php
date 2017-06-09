@@ -85,7 +85,13 @@ function getAllRanks(){
     return $result;
 }
 
-
+function getAllOrderTypes(){
+    global $conn;
+    $sql = $conn->prepare("select * from ordertypes order by id");
+    $sql->execute();
+    $result = $sql->fetchAll(PDO::FETCH_OBJ);
+    return $result;
+}
 
 function getDetailedOrders() {
     global $conn;
@@ -103,5 +109,32 @@ left join ranks cr on  p.currentdiv = cr.id
 ");
     $sql->execute();
     $result = $sql->fetchAll(PDO::FETCH_OBJ);
+    return $result;
+}
+
+function getRanksTranslate()
+{
+    $allranks = getAllRanks();
+    $allranktranslate = array();
+    foreach ($allranks as $item) {
+        $num = array(1, 2, 3, 4, 5, 'Challenger', 'Master');
+        $newnum = array('I', 'II', 'III', 'IV', 'V', 'ChallengerI', 'MasterI');
+        $newstring = str_replace($num, $newnum, $item->name);
+        $allranktranslate[strtoupper(str_replace(' ', '', $newstring))] = $item->id;
+    }
+    return $allranktranslate;
+}
+
+
+function getSallaryByPlayer($userid){
+    global $conn;
+    $sql = $conn->prepare("select playerid, sum(round(price*0.6)) profit, case when sum(datediff(end_time, create_time)) > 0 then sum(datediff(end_time, create_time)) else 0 end days
+from orders
+where status = 1
+and playerid = :uid
+group by playerid");
+    $sql->bindParam(":uid", $userid);
+    $sql->execute();
+    $result = $sql->fetch(PDO::FETCH_OBJ);
     return $result;
 }

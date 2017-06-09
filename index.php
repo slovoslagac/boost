@@ -1,19 +1,26 @@
 <?php
 include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 
-if (!$session->isLoggedIn()) {
+if (!$session->isLoggedIn() and $session != '') {
     redirectTo("login.php");
 }
 
+$allordertypes = getAllOrderTypes();
 $allservers = getAllServers();
 $allranks = getAllRanks();
 $allorders = getDetailedOrders();
 $ranksTranslation = getRanksTranslate();
 $serverName = array();
+$ordertypes = array();
 foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
 
+foreach ($allordertypes as $item) {
+    if($item->APIname != '') {
+        $ordertypes[$item->id] = $item->APIname;
+    }
+}
 
 $currentuser = getuserbyuserid($session->userid);
 $earnings = getSallaryByPlayer($session->userid);
@@ -30,10 +37,11 @@ if(isset($_POST["saveorder"])){
 
     $serverid = $_POST["optionsRadios"];
     $server = $serverName[$serverid];
-    $boostuser = $_POST["boostusername"];
+    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
+    $oredertype = $_POST["rankOptions"];
     $currentsummoner = getSummonerDetails($server, $boostuser);
     if($currentsummoner != false) {
-        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid);
+        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$oredertype]);
         $autopoints = $currentsummonerranking->leaguePoints;
         $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
         $currentdiv = $ranksTranslation[$tmpvar];
@@ -42,8 +50,9 @@ if(isset($_POST["saveorder"])){
         $lppoints = $_POST["lppoint"];
         $price = $_POST["boostprice"];
 
+
         try {
-            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints);
+            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $oredertype);
             $currentorder->addorder();
 
         } catch (Exception $e) {
@@ -159,6 +168,21 @@ include $headLayout;
                                     <h4 class="modal-title">Dodaj novi order</h4>
                                 </div>
                                 <div class="modal-body">
+                                    <label for="exampleInputEmail1">Vrsta ordera</label>
+                                    <div class="form-group" style="margin-top:10px;">
+                                            <div class="radio">
+                                                <?php foreach ($allordertypes as $item) {?>
+                                                    <label>
+                                                        <input type="radio" name="rankOptions" id="" value="<?php echo $item->id?>" <?php echo ($item->APIname !='')? 'checked':'disabled'?>><?php echo $item->name?>
+                                                    </label>
+
+
+
+                                                <?php }?>
+
+
+                                            </div>
+                                    </div>    
                                     <div class="form-group">
                                         <label for="boostusername">Username accounta</label>
                                         <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije" required>
@@ -166,17 +190,18 @@ include $headLayout;
                                     <hr>
                                     <label for="exampleInputEmail1">Server</label>
                                     <div class="form-group" style="margin-top:10px;">
+                                        <div class="radio">
                                         <?php foreach ($allservers as $item) { ?>
-                                            <div class="radio">
+                                            
                                                 <label>
                                                     <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>" value="<?php echo $item->id ?>" checked>
                                                     <?php echo $item->name ?>
                                                 </label>
-                                            </div>
+                                            
 
 
                                         <?php } ?>
-
+                                            </div>
                                     </div>
                                     <hr>
                                     <div class="form-group">
@@ -241,7 +266,7 @@ include $headLayout;
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->start ($item->points)";?></td>
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '')? $item->cp : $item->ap ; echo "$item->cr ($tmppoint)";?></td>
                                 <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end";?></td>
-                                <td style="line-height:32px; text-align:center; width:94px;">12/1 (90%)</td>
+                                <td style="line-height:32px; text-align:center; width:94px;">N/A</td>
                                 <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price €";?></span></td>
                                 <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-blue"><?php echo "$item->profit €";?></span></td>
 

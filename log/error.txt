@@ -8,3 +8,4 @@
 08.06.2017 14:11:15 | Problem sa kreiranjem ponude : 2, , 2, 1, 1, 50, 50, , 
 08.06.2017 14:13:14 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
 08.06.2017 14:15:23 | Problem sa dohvatanjem podataka sa API-a :  eun1, misternixxx,
+09.06.2017 16:30:48 | Problem sa kreiranjem ponude : 2, 1, 1, 20, 18, 2, 1212121, 2, 0
