@@ -5,17 +5,20 @@ if (!$session->isLoggedIn() and $session != '') {
     redirectTo("login.php");
 }
 $addminarray = array(2);
-
-
+$currenciessign = array(1 => "€", 2 => "$", 3 => "£");
+$ordertypeclass = array('SD' => 'blue','SP' => 'maroon','SNW' => 'olive','DD' => 'orange','DP' => 'navy','DNW' => 'black','SN' => 'red');
 
 $allordertypes = getAllOrderTypes();
 $allservers = getAllServers();
 $allranks = getAllRanks();
 $allorders = getDetailedOrders();
+$allcurrencies = getAllCurrencies();
+$allsites = getAllSites();
 $ranksTranslation = getRanksTranslate();
 $serverName = array();
 $ordertypes = array();
 $ordertypesbyname = array();
+$ordertypesbyid = array();
 foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
@@ -25,6 +28,7 @@ foreach ($allordertypes as $item) {
         $ordertypes[$item->id] = $item->APIname;
     }
     $ordertypesbyname[$item->name] = $item->id;
+    $ordertypesbyid[$item->id]=$item->shortname;
 }
 
 $currentuser = getuserbyuserid($session->userid);
@@ -38,35 +42,48 @@ if ($earnings != '') {
     $currentearnings = 0;
 }
 //
-if(isset($_POST["saveorder"])){
-//
-//    $serverid = $_POST["optionsRadios"];
-//    $server = $serverName[$serverid];
-//    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
-//    $oredertype = $_POST["rankOptions"];
-//    $currentsummoner = getSummonerDetails($server, $boostuser);
-//    if($currentsummoner != false) {
-//        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$oredertype]);
-//        $autopoints = $currentsummonerranking->leaguePoints;
-//        $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
-//        $currentdiv = $ranksTranslation[$tmpvar];
-//        $startdiv = $_POST["startdivison"];
-//        $enddiv = $_POST["enddivision"];
-//        $lppoints = $_POST["lppoint"];
-//        $price = $_POST["boostprice"];
-//
-//
-//        try {
-//            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $oredertype);
-//            $currentorder->addorder();
-//
-//        } catch (Exception $e) {
-//            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints", 'error.txt');
-//        }
-//    }
-//
-//    header("Location:index.php");
-//
+if (isset($_POST["saveorder"])) {
+    $ordertypename = $_POST["soloduo"] . ' ' . $_POST["boost"];
+    $ordertype = $ordertypesbyname[$ordertypename];
+    $currencytype = $_POST["currency"];
+    $siteid = $_POST["sites"];
+    ($_POST["gamenumber"] != '') ? $gamenumber = $_POST["gamenumber"]: $gamenumber = 0;
+    $winnumber = $_POST["winnumber"];
+    $playerusername = $_POST["playerusername"];
+
+
+    $serverid = $_POST["optionsRadios"];
+    $server = $serverName[$serverid];
+    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
+    $currentsummoner = getSummonerDetails($server, $boostuser);
+    if($currentsummoner != false) {
+        if( in_array($ordertype, $ordertypes)) {
+            $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$ordertype]);
+            $autopoints = $currentsummonerranking->leaguePoints;
+            $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
+            $currentdiv = $ranksTranslation[$tmpvar];
+        } else {
+            $autopoints = 0;
+            $currentdiv = 0;
+        }
+        ($_POST["startdivison"] != '') ? $startdiv = $_POST["startdivison"] : $startdiv = 0;
+        ($_POST["enddivision"] != '') ? $enddiv = $_POST["enddivision"] : $enddiv = 0;
+        ($_POST["lppoint"] != '') ? $lppoints = $_POST["lppoint"] : $lppoints = 0;
+        $price = $_POST["boostprice"];
+
+        try {
+            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber, $playerusername);
+            $currentorder->addorder();
+
+        } catch (Exception $e) {
+            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber, $e", 'error.txt');
+        }
+    }
+
+    unset($currentorder, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber);
+
+    header("Location:index.php");
+
 }
 
 include $headLayout;
@@ -176,9 +193,10 @@ include $headLayout;
                                 <div class="modal-body">
                                     <div class="form-group order-line">
                                         <label>Sajt</label>
-                                        <select class="form-control" style="display:inline; width:250px;float:right;">
-                                            <option>GGBoost</option>
-                                            <option>EloBoost24</option>
+                                        <select class="form-control" name="sites" style="display:inline; width:250px;float:right;">
+                                            <?php foreach ($allsites as $item) {?>
+                                            <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
+                                            <?php }?>
                                         </select>
                                     </div>
                                     <div class="form-group order-line">
@@ -214,11 +232,11 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsplayerSummonerName" style="display: none;">
                                         <label for="exampleInputEmail1">Summoner name Duo naloga</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi tvoj summoner name" style="float:right; width:250px;">
+                                        <input type="text" class="form-control" id="playerusername" name="playerusername" placeholder="Unesi tvoj summoner name" style="float:right; width:250px;">
                                     </div>
                                     <div class="form-group order-line" id="jsplayerCustomerName">
                                         <label for="exampleInputEmail1">Summoner name mušterije</label>
-                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije" required
+                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije"
                                                style="float:right; width:250px;">
                                     </div>
                                     <div class="form-group order-line" id="jsserver">
@@ -226,7 +244,7 @@ include $headLayout;
                                         <div class="radio">
                                             <?php foreach ($allservers as $item) { ?>
                                                 <label>
-                                                    <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>" value="<?php echo $item->id ?>" checked>
+                                                    <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>" value="<?php echo $item->id ?>" <?php echo ($item->shortname == 'EUW') ? "checked" : ""?>>
                                                     <?php echo $item->name ?>
                                                 </label>
                                             <?php } ?>
@@ -234,7 +252,8 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsstartdivision">
                                         <label>Početna divizija</label>
-                                        <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison" required>
+                                        <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison">
+                                                <option value=""></option>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
                                             <?php } ?>
@@ -242,11 +261,12 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jslppoints">
                                         <label for="exampleInputEmail1">Broj LP poena</label>
-                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" style="display:inline; width:250px; float:right" required>
+                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jsenddivision">
                                         <label>Krajnja divizija</label>
-                                        <select class="form-control" name="enddivision" style="display:inline; width:250px;float:right;" required>
+                                        <select class="form-control" name="enddivision" style="display:inline; width:250px;float:right;">
+                                            <option value=""></option>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
                                             <?php } ?>
@@ -254,28 +274,24 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsgejnumber" style="display: none;">
                                         <label for="exampleInputEmail1">Broj gejmova</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi broj traženih gejmova" style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="gamenumber" name="gamenumber" placeholder="Unesi broj traženih gejmova" style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jswinnumber" style="display: none;">
                                         <label for="exampleInputEmail1">Broj pobeda</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi broj traženih pobeda" style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="winnumber" name="winnumber" placeholder="Unesi broj traženih pobeda" style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jsprice">
                                         <label for="exampleInputEmail1">Cena ordera</label>
                                         <div class="form-group" style="margin-top:10px; display:inline;">
                                             <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="money" id="eur" value="eur" checked>
-                                                    EUR
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="money" id="usd" value="usd">
-                                                    USD
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="money" id="gbp" value="gbp">
-                                                    GBP
-                                                </label>
+                                                <?php foreach ($allcurrencies as $item) { ?>
+                                                    <label>
+                                                        <input type="radio" name="currency" id="<?php echo strtolower($item->name) ?>" value="<?php echo $item->id ?>" checked>
+                                                        <?php echo $item->name ?>
+                                                    </label>
+
+
+                                                <?php } ?>
                                             </div>
                                         </div>
                                         <input type="number" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" style="float:right; width:250px;">
@@ -309,19 +325,18 @@ include $headLayout;
                         </tr>
                         <?php $i = 1;
                         foreach ($allorders as $item) {
-                            if ($item->playerid == $session->userid or in_array($session->userid, $addminarray)) {
+                            if ($item->playerid == $session->userid or in_array($session->userid, $addminarray)) { $currencyid=$item->currency; $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
                                 ?>
                                 <tr>
-                                    <td style="line-height:32px; text-align:center; width:10px;"><?php echo "$i." ?></td>
+                                    <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassordertype?>"><span title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </span></td>
                                     <td style="line-height:32px;"><b><?php echo $item->name; ?></b></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->start ($item->points)"; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '') ? $item->cp : $item->ap;
-                                        echo "$item->cr ($tmppoint)"; ?></td>
+                                    <td style="line-height:32px; text-align:center; width:70px;"><?php echo ($item->start != '') ? "$item->start ($item->points)" : ""; ?></td>
+                                    <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '') ? $item->cp : $item->ap; echo ($item->cr != "") ? "$item->cr ($tmppoint)" : ""; ?></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end"; ?></td>
                                     <td style="line-height:32px; text-align:center; width:94px;">N/A</td>
-                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price €"; ?></span></td>
-                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-blue"><?php echo "$item->profit €"; ?></span></td>
+                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price $currenciessign[$currencyid]"; ?></span></td>
+                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-blue"><?php echo "$item->profit $currenciessign[$currencyid]"; ?></span></td>
 
                                     <?php echo ($item->status == 0) ? '<td style="width:51px;"><a class="btn btn-social-icon btn-google"><i class="fa fa-close"></i></a></td>' : '<td style="width:51px;"><a class="btn btn-social-icon btn-dropbox"><i class="fa fa-check"></i></a></td>';
 
@@ -665,7 +680,7 @@ include $headLayout;
 
     function defValue(val) {
         var tmpVal = val;
-        switch (tmpVal){
+        switch (tmpVal) {
             case 1:
                 document.getElementById("jsprice").style.display = "none";
                 document.getElementById("jsserver").style.display = "none";
@@ -674,7 +689,10 @@ include $headLayout;
                 document.getElementById("saveorder").style.display = "none";
                 break;
             case 2:
-                if(document.getElementById("duo").checked) {document.getElementById("jsplayerSummonerName").style.display = "";};
+                if (document.getElementById("duo").checked) {
+                    document.getElementById("jsplayerSummonerName").style.display = "";
+                }
+                ;
                 document.getElementById("jsprice").style.display = "";
                 document.getElementById("jsserver").style.display = "";
                 document.getElementById("jsplayerCustomerName").style.display = "";

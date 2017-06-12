@@ -93,21 +93,37 @@ function getAllOrderTypes(){
     return $result;
 }
 
+function getAllCurrencies(){
+    global $conn;
+    $sql = $conn->prepare("select * from currency order by id");
+    $sql->execute();
+    $result = $sql->fetchAll(PDO::FETCH_OBJ);
+    return $result;
+}
+
+function getAllSites(){
+    global $conn;
+    $sql = $conn->prepare("select * from sitesource order by id");
+    $sql->execute();
+    $result = $sql->fetchAll(PDO::FETCH_OBJ);
+    return $result;
+}
+
 
 
 function getDetailedOrders() {
     global $conn;
-    $sql = $conn->prepare("select p.name, p.server, p.start, p.points, p.end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid
+    $sql = $conn->prepare("select p.name, p.server, r.shortname start, p.points, e.shortname as end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid, p.currency, p.ordertype
 from
 (
-select s.name, srv.shortname as server, r.shortname start, o.points, e.shortname as end, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap, o.playerid
-from orders o, apisummoners s, servers srv, ranks r, ranks e
+select s.name, srv.shortname as server, o.startdiv , o.points, enddiv, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap, o.playerid, o.currency, o.ordertype
+from orders o, apisummoners s, servers srv
 where o.boostusername = s.id
 and o.server = srv.id
-and o.startdiv = r.id
-and o.enddiv = e.id
 ) p
 left join ranks cr on  p.currentdiv = cr.id
+left join ranks r on p.startdiv = r.id
+left join ranks e on p.enddiv = e.id
 ");
     $sql->execute();
     $result = $sql->fetchAll(PDO::FETCH_OBJ);
