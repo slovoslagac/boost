@@ -1,6 +1,6 @@
 insert into servers(name,shortname,shortname2) values ('Europe West','EUW','euw1'),('Europe North East','EUN','eun1'),('North America','NA','na1')
 
-insert into ordertypes (name) values('Solo Ranked'),('Duo Ranked'),('Solo Flex'),('Duo Flex'),('Normali'),('Net Wins') ;
+insert into ordertypes (name, shortname) values('Solo Division','SD'),('Solo Placement','SP'),('Solo Net Wins','SNW'),('Solo Normal','SN'),('Duo Division','DD'),('Duo Placement','DP'),('Duo Net Wins','DNW') ;
 update ordertypes set APIname = 'RANKED_SOLO_5x5' where id = 1 ;
 
 insert into ranks (name, `order`, shortname)

@@ -1,12 +1,11 @@
 <?php
 include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 
-if (!$session->isLoggedIn() and $session != '') {
+if (!$session->isLoggedIn()) {
     redirectTo("login.php");
 }
+
 $addminarray = array(2);
-
-
 
 $allordertypes = getAllOrderTypes();
 $allservers = getAllServers();
@@ -15,16 +14,14 @@ $allorders = getDetailedOrders();
 $ranksTranslation = getRanksTranslate();
 $serverName = array();
 $ordertypes = array();
-$ordertypesbyname = array();
 foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
 
 foreach ($allordertypes as $item) {
-    if ($item->APIname != '') {
+    if($item->APIname != '') {
         $ordertypes[$item->id] = $item->APIname;
     }
-    $ordertypesbyname[$item->name] = $item->id;
 }
 
 $currentuser = getuserbyuserid($session->userid);
@@ -37,36 +34,36 @@ if ($earnings != '') {
     $erningsrate = 0;
     $currentearnings = 0;
 }
-//
+
 if(isset($_POST["saveorder"])){
-//
-//    $serverid = $_POST["optionsRadios"];
-//    $server = $serverName[$serverid];
-//    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
-//    $oredertype = $_POST["rankOptions"];
-//    $currentsummoner = getSummonerDetails($server, $boostuser);
-//    if($currentsummoner != false) {
-//        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$oredertype]);
-//        $autopoints = $currentsummonerranking->leaguePoints;
-//        $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
-//        $currentdiv = $ranksTranslation[$tmpvar];
-//        $startdiv = $_POST["startdivison"];
-//        $enddiv = $_POST["enddivision"];
-//        $lppoints = $_POST["lppoint"];
-//        $price = $_POST["boostprice"];
-//
-//
-//        try {
-//            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $oredertype);
-//            $currentorder->addorder();
-//
-//        } catch (Exception $e) {
-//            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints", 'error.txt');
-//        }
-//    }
-//
-//    header("Location:index.php");
-//
+
+    $serverid = $_POST["optionsRadios"];
+    $server = $serverName[$serverid];
+    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
+    $oredertype = $_POST["rankOptions"];
+    $currentsummoner = getSummonerDetails($server, $boostuser);
+    if($currentsummoner != false) {
+        $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$oredertype]);
+        $autopoints = $currentsummonerranking->leaguePoints;
+        $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
+        $currentdiv = $ranksTranslation[$tmpvar];
+        $startdiv = $_POST["startdivison"];
+        $enddiv = $_POST["enddivision"];
+        $lppoints = $_POST["lppoint"];
+        $price = $_POST["boostprice"];
+
+
+        try {
+            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $oredertype);
+            $currentorder->addorder();
+
+        } catch (Exception $e) {
+            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints", 'error.txt');
+        }
+    }
+
+    header("Location:index.php");
+
 }
 
 include $headLayout;
@@ -111,8 +108,7 @@ include $headLayout;
 
                                 <p>
                                     <?php echo $currentuser->name ?> - Booster
-                                    <small>Member since <?php $new_datetime = DateTime::createFromFormat("Y-m-d H:i:s", $currentuser->create_time);
-                                        echo $new_datetime->format('M, Y');; ?></small>
+                                    <small>Member since <?php $new_datetime = DateTime::createFromFormat ( "Y-m-d H:i:s", $currentuser->create_time ); echo $new_datetime->format('M, Y'); ;?></small>
                                 </p>
                             </li>
                             <!-- Menu Body -->
@@ -174,116 +170,71 @@ include $headLayout;
                                     <h4 class="modal-title">Dodaj novi order</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="form-group order-line">
-                                        <label>Sajt</label>
-                                        <select class="form-control" style="display:inline; width:250px;float:right;">
-                                            <option>GGBoost</option>
-                                            <option>EloBoost24</option>
-                                        </select>
+                                    <label for="exampleInputEmail1">Vrsta ordera</label>
+                                    <div class="form-group" style="margin-top:10px;">
+                                            <div class="radio">
+                                                <?php foreach ($allordertypes as $item) {?>
+                                                    <label>
+                                                        <input type="radio" name="rankOptions" id="" value="<?php echo $item->id?>" <?php echo ($item->APIname !='')? 'checked':'disabled'?>><?php echo $item->name?>
+                                                    </label>
+
+
+
+                                                <?php }?>
+
+
+                                            </div>
+                                    </div>    
+                                    <div class="form-group">
+                                        <label for="boostusername">Username accounta</label>
+                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije" required>
                                     </div>
-                                    <div class="form-group order-line">
-                                        <label for="exampleInputEmail1">Boost</label>
+                                    <hr>
+                                    <label for="exampleInputEmail1">Server</label>
+                                    <div class="form-group" style="margin-top:10px;">
                                         <div class="radio">
-                                            <label>
-                                                <input type="radio" name="boost" id="division" value="Division" onclick="radioClick(1)" checked>
-                                                Division
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="boost" id="placement" value="Placement" onclick="radioClick(2)">
-                                                Placement
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="boost" id="netwins" value="Net Wins" onclick="radioClick(3)">
-                                                Net Wins
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="boost" id="normal" value="Normal" onclick="radioClick(4)">
-                                                Normal
-                                            </label>
-                                        </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="soloduo" id="solo" value="Solo" onclick="radioClick(5)" checked>
-                                                Solo
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="soloduo" id="duo" value="Duo" onclick="radioClick(6)">
-                                                Duo
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group order-line" id="jsplayerSummonerName" style="display: none;">
-                                        <label for="exampleInputEmail1">Summoner name Duo naloga</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi tvoj summoner name" style="float:right; width:250px;">
-                                    </div>
-                                    <div class="form-group order-line" id="jsplayerCustomerName">
-                                        <label for="exampleInputEmail1">Summoner name mušterije</label>
-                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije" required
-                                               style="float:right; width:250px;">
-                                    </div>
-                                    <div class="form-group order-line" id="jsserver">
-                                        <label for="exampleInputEmail1">Server</label>
-                                        <div class="radio">
-                                            <?php foreach ($allservers as $item) { ?>
+                                        <?php foreach ($allservers as $item) { ?>
+                                            
                                                 <label>
                                                     <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>" value="<?php echo $item->id ?>" checked>
                                                     <?php echo $item->name ?>
                                                 </label>
-                                            <?php } ?>
-                                        </div>
-                                    </div>
-                                    <div class="form-group order-line" id="jsstartdivision">
-                                        <label>Početna divizija</label>
-                                        <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison" required>
-                                            <?php foreach ($allranks as $item) { ?>
-                                                <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group order-line" id="jslppoints">
-                                        <label for="exampleInputEmail1">Broj LP poena</label>
-                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" style="display:inline; width:250px; float:right" required>
-                                    </div>
-                                    <div class="form-group order-line" id="jsenddivision">
-                                        <label>Krajnja divizija</label>
-                                        <select class="form-control" name="enddivision" style="display:inline; width:250px;float:right;" required>
-                                            <?php foreach ($allranks as $item) { ?>
-                                                <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group order-line" id="jsgejnumber" style="display: none;">
-                                        <label for="exampleInputEmail1">Broj gejmova</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi broj traženih gejmova" style="display:inline; width:250px; float:right">
-                                    </div>
-                                    <div class="form-group order-line" id="jswinnumber" style="display: none;">
-                                        <label for="exampleInputEmail1">Broj pobeda</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Unesi broj traženih pobeda" style="display:inline; width:250px; float:right">
-                                    </div>
-                                    <div class="form-group order-line" id="jsprice">
-                                        <label for="exampleInputEmail1">Cena ordera</label>
-                                        <div class="form-group" style="margin-top:10px; display:inline;">
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="money" id="eur" value="eur" checked>
-                                                    EUR
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="money" id="usd" value="usd">
-                                                    USD
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="money" id="gbp" value="gbp">
-                                                    GBP
-                                                </label>
+                                            
+
+
+                                        <?php } ?>
                                             </div>
-                                        </div>
-                                        <input type="number" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" style="float:right; width:250px;">
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label>Početna divizija</label>
+                                        <select class="form-control" name="startdivison" required>
+                                           <?php foreach ($allranks as $item) { ?>
+                                               <option value="<?php echo $item->id?>"><?php echo $item->name?></option>
+                                           <?php }?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lppoint">Broj LP poena</label>
+                                        <input type="text" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Krajnja divizija</label>
+                                        <select class="form-control" name="enddivision" required>
+                                            <?php foreach ($allranks as $item) { ?>
+                                                <option value="<?php echo $item->id?>"><?php echo $item->name?></option>
+                                            <?php }?>
+                                        </select>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label for="boostprice">Cena ordera</label>
+                                        <input type="text" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Zatvori</button>
-                                    <button type="submit" class="btn btn-primary" name="saveorder" id="saveorder">Dodaj order</button>
+                                    <button type="submit" class="btn btn-primary" name="saveorder">Dodaj order</button>
                                 </div>
                             </div>
                             <!-- /.modal-content -->
@@ -307,33 +258,29 @@ include $headLayout;
                             <th></th>
 
                         </tr>
-                        <?php $i = 1;
-                        foreach ($allorders as $item) {
-                            if ($item->playerid == $session->userid or in_array($session->userid, $addminarray)) {
+                        <?php $i=1; foreach($allorders as $item) {
+                            if(in_array($session->userid, $addminarray) or $item->playerid == $session->userid) {
+                            ?>
+                            <tr>
+                                <td style="line-height:32px; text-align:center; width:10px;"><?php echo "$i."?></td>
+                                <td style="line-height:32px;"><b><?php echo $item->name;?></b></td>
+                                <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server;?></td>
+                                <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->start ($item->points)";?></td>
+                                <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '')? $item->cp : $item->ap ; echo "$item->cr ($tmppoint)";?></td>
+                                <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end";?></td>
+                                <td style="line-height:32px; text-align:center; width:94px;">N/A</td>
+                                <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price €";?></span></td>
+                                <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-blue"><?php echo "$item->profit €";?></span></td>
+
+                                <?php echo ($item->status == 0) ?  '<td style="width:51px;"><a class="btn btn-social-icon btn-google"><i class="fa fa-close"></i></a></td>' : '<td style="width:51px;"><a class="btn btn-social-icon btn-dropbox"><i class="fa fa-check"></i></a></td>' ;
+
+
                                 ?>
-                                <tr>
-                                    <td style="line-height:32px; text-align:center; width:10px;"><?php echo "$i." ?></td>
-                                    <td style="line-height:32px;"><b><?php echo $item->name; ?></b></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->start ($item->points)"; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '') ? $item->cp : $item->ap;
-                                        echo "$item->cr ($tmppoint)"; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end"; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:94px;">N/A</td>
-                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price €"; ?></span></td>
-                                    <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-blue"><?php echo "$item->profit €"; ?></span></td>
 
-                                    <?php echo ($item->status == 0) ? '<td style="width:51px;"><a class="btn btn-social-icon btn-google"><i class="fa fa-close"></i></a></td>' : '<td style="width:51px;"><a class="btn btn-social-icon btn-dropbox"><i class="fa fa-check"></i></a></td>';
+                            </tr>
 
 
-                                    ?>
-
-                                </tr>
-
-
-                                <?php $i++;
-                            }
-                        } ?>
+                        <?php $i++;} } ?>
 
                     </table>
                 </div>
@@ -371,7 +318,7 @@ include $headLayout;
                 <div class="widget-user-header bg-aqua-active">
                     <h3 class="widget-user-username"><?php echo $currentuser->name ?></h3>
                     <h5 class="widget-user-desc"><?php echo $currentuser->username ?></h5>
-                    <div class="zarada"><?php echo "$currentearnings €" ?></div>
+                    <div class="zarada"><?php  echo "$currentearnings €"?></div>
                 </div>
                 <div class="widget-user-image">
                     <img class="img-circle" src="dist/img/user1-128x128.jpg" alt="User Avatar">
@@ -396,7 +343,7 @@ include $headLayout;
                         <!-- /.col -->
                         <div class="col-sm-4">
                             <div class="description-block">
-                                <h5 class="description-header"><?php echo "$erningsrate €/dan" ?></h5>
+                                <h5 class="description-header"><?php  echo "$erningsrate €/dan"?></h5>
                                 <span class="description-text">ZARADA</span>
                             </div>
                             <!-- /.description-block -->
@@ -439,11 +386,11 @@ include $headLayout;
                 <!-- /.box-header -->
                 <div class="box-body no-padding">
                     <table class="table table-condensed">
-                        <!--                        <tr>-->
-                        <!--                            <th style="width: 20px">#</th>-->
-                        <!--                            <th>Booster</th>-->
-                        <!--                            <th style="width: 40px">€</th>-->
-                        <!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th style="width: 20px">#</th>-->
+<!--                            <th>Booster</th>-->
+<!--                            <th style="width: 40px">€</th>-->
+<!--                        </tr>-->
 
 
                     </table>
@@ -484,11 +431,9 @@ include $headLayout;
                                     <h3 class="timeline-header"><a href="#">Dado</a>: Rezervacije</h3>
 
                                     <div class="timeline-body">
-                                        Radi bolje organizacije i što bolje iskorišćenosti računara od danas je obavezno rezervisati termin u kojem želite da boostujete. Postavljene rezervacije su
-                                        obavezne i
+                                        Radi bolje organizacije i što bolje iskorišćenosti računara od danas je obavezno rezervisati termin u kojem želite da boostujete. Postavljene rezervacije su obavezne i
                                         moraju se poštovati. Booster bez rezervacije može zauzeti samo kompjuter koji nije rezervisan.<br><br>
-                                        Booster koji rezerviše računar, a ne ispoštuje rezervaciju, gubiće pravo da rezerviše računar. Zakazana rezervacija se poštuje sa najviše 15 minuta zakašnjenja,
-                                        nakon
+                                        Booster koji rezerviše računar, a ne ispoštuje rezervaciju, gubiće pravo da rezerviše računar. Zakazana rezervacija se poštuje sa najviše 15 minuta zakašnjenja, nakon
                                         toga je računar slobodan.
                                     </div>
 
@@ -660,102 +605,5 @@ include $headLayout;
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->
-<script>
-    //    document.getElementById("radioButton").click()
-
-    function defValue(val) {
-        var tmpVal = val;
-        switch (tmpVal){
-            case 1:
-                document.getElementById("jsprice").style.display = "none";
-                document.getElementById("jsserver").style.display = "none";
-                document.getElementById("jsplayerCustomerName").style.display = "none";
-                document.getElementById("jsplayerSummonerName").style.display = "none";
-                document.getElementById("saveorder").style.display = "none";
-                break;
-            case 2:
-                if(document.getElementById("duo").checked) {document.getElementById("jsplayerSummonerName").style.display = "";};
-                document.getElementById("jsprice").style.display = "";
-                document.getElementById("jsserver").style.display = "";
-                document.getElementById("jsplayerCustomerName").style.display = "";
-                document.getElementById("saveorder").style.display = "";
-
-
-        }
-    }
-
-
-    function radioClick(val) {
-        var option = val;
-
-        switch (option) {
-            case 1:
-                document.getElementById("jsstartdivision").style.display = "";
-                document.getElementById("jslppoints").style.display = "";
-                document.getElementById("jsenddivision").style.display = "";
-                document.getElementById("jsgejnumber").style.display = "none";
-                document.getElementById("jswinnumber").style.display = "none";
-                defValue(2);
-                break;
-            case 2:
-                document.getElementById("jsstartdivision").style.display = "none";
-                document.getElementById("jslppoints").style.display = "none";
-                document.getElementById("jsenddivision").style.display = "none";
-                document.getElementById("jsgejnumber").style.display = "";
-                document.getElementById("jswinnumber").style.display = "";
-                defValue(2);
-                break;
-            case 3:
-                document.getElementById("jsstartdivision").style.display = "none";
-                document.getElementById("jslppoints").style.display = "none";
-                document.getElementById("jsenddivision").style.display = "none";
-                document.getElementById("jsgejnumber").style.display = "none";
-                document.getElementById("jswinnumber").style.display = "";
-                defValue(2);
-                break;
-            case 4:
-                if (document.getElementById("duo").checked) {
-                    document.getElementById("jsstartdivision").style.display = "none";
-                    document.getElementById("jslppoints").style.display = "none";
-                    document.getElementById("jsenddivision").style.display = "none";
-                    document.getElementById("jsgejnumber").style.display = "none";
-                    document.getElementById("jswinnumber").style.display = "none";
-                    defValue(1);
-                } else {
-                    document.getElementById("jsstartdivision").style.display = "none";
-                    document.getElementById("jslppoints").style.display = "none";
-                    document.getElementById("jsenddivision").style.display = "none";
-                    document.getElementById("jsgejnumber").style.display = "";
-                    document.getElementById("jswinnumber").style.display = "";
-                    defValue(2);
-                }
-                break;
-            case 5:
-                document.getElementById("jsplayerSummonerName").style.display = "none";
-                if (document.getElementById("normal").checked) {
-                    document.getElementById("jsstartdivision").style.display = "none";
-                    document.getElementById("jslppoints").style.display = "none";
-                    document.getElementById("jsenddivision").style.display = "none";
-                    document.getElementById("jsgejnumber").style.display = "";
-                    document.getElementById("jswinnumber").style.display = "";
-                    defValue(2);
-                }
-                break;
-            case 6:
-                if (document.getElementById("normal").checked) {
-                    document.getElementById("jsstartdivision").style.display = "none";
-                    document.getElementById("jslppoints").style.display = "none";
-                    document.getElementById("jsenddivision").style.display = "none";
-                    document.getElementById("jsgejnumber").style.display = "none";
-                    document.getElementById("jswinnumber").style.display = "none";
-                    defValue(1);
-                } else {
-                    document.getElementById("jsplayerSummonerName").style.display = "";
-                }
-                break;
-        }
-    }
-
-</script>
 </body>
 </html>

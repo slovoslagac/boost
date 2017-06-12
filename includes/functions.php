@@ -93,6 +93,8 @@ function getAllOrderTypes(){
     return $result;
 }
 
+
+
 function getDetailedOrders() {
     global $conn;
     $sql = $conn->prepare("select p.name, p.server, p.start, p.points, p.end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid
@@ -138,3 +140,4 @@ group by playerid");
     $result = $sql->fetch(PDO::FETCH_OBJ);
     return $result;
 }
+

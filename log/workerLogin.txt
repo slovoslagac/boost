@@ -5,3 +5,6 @@
 07.06.2017 23:47:14 | Login : userid = 3
 08.06.2017 08:35:03 | Login : userid = 2
 08.06.2017 12:44:45 | Login : userid = 2
+12.06.2017 17:11:29 | Logout : userid = 2
+12.06.2017 17:12:09 | Login : userid = 2
+12.06.2017 17:20:41 | Login : userid = 3
