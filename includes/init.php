@@ -7,6 +7,8 @@ defined('LAYOUT_PATH') ? null : define('LAYOUT_PATH', SITE_ROOT . DS . 'layouts'
 defined('INC_PATH') ? null : define('INC_PATH', SITE_ROOT . DS . 'includes');
 
 
+
+
 //Clasess
 
 require INC_PATH . DS . 'config.php';
@@ -18,6 +20,7 @@ require INC_PATH . DS . 'session.php';
 require INC_PATH . DS . 'summoners.php';
 require INC_PATH . DS . 'orders.php';
 
+//CSS
 
 //Layouts
 
@@ -26,4 +29,4 @@ $headLayout = LAYOUT_PATH.DS.'head.php';
 //Variables
 
 $salt = "$%klsakdlkakal#$$";
-
+$adminarray = array(1,3);

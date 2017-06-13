@@ -4,7 +4,7 @@ include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 if (!$session->isLoggedIn() and $session != '') {
     redirectTo("login.php");
 }
-$addminarray = array(2);
+
 $currenciessign = array(1 => "€", 2 => "$", 3 => "£");
 $ordertypeclass = array('SD' => 'blue','SP' => 'maroon','SNW' => 'olive','DD' => 'orange','DP' => 'navy','DNW' => 'black','SN' => 'red');
 
@@ -57,7 +57,7 @@ if (isset($_POST["saveorder"])) {
     $boostuser = str_replace(" ", "",$_POST["boostusername"]);
     $currentsummoner = getSummonerDetails($server, $boostuser);
     if($currentsummoner != false) {
-        if( in_array($ordertype, $ordertypes)) {
+        if( in_array($ordertypes[$ordertype], $ordertypes)) {
             $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$ordertype]);
             $autopoints = $currentsummonerranking->leaguePoints;
             $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
@@ -325,7 +325,7 @@ include $headLayout;
                         </tr>
                         <?php $i = 1;
                         foreach ($allorders as $item) {
-                            if ($item->playerid == $session->userid or in_array($session->userid, $addminarray)) { $currencyid=$item->currency; $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
+                            if ($item->playerid == $session->userid or in_array($session->userid, $adminarray)) { $currencyid=$item->currency; $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
                                 ?>
                                 <tr>
                                     <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassordertype?>"><span title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </span></td>
