@@ -6,30 +6,20 @@ if (!$session->isLoggedIn() and $session != '') {
 }
 function getUserIP()
 {
-    $client  = @$_SERVER['HTTP_CLIENT_IP'];
+    $client = @$_SERVER['HTTP_CLIENT_IP'];
     $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-    $remote  = $_SERVER['REMOTE_ADDR'];
+    $remote = $_SERVER['REMOTE_ADDR'];
 
-    if(filter_var($client, FILTER_VALIDATE_IP))
-    {
+    if (filter_var($client, FILTER_VALIDATE_IP)) {
         $ip = $client;
-    }
-    elseif(filter_var($forward, FILTER_VALIDATE_IP))
-    {
+    } elseif (filter_var($forward, FILTER_VALIDATE_IP)) {
         $ip = $forward;
-    }
-    else
-    {
+    } else {
         $ip = $remote;
     }
 
     return $ip;
 }
-
-
-
-$currenciessign = array(1 => "€", 2 => "$", 3 => "£");
-$ordertypeclass = array('SD' => 'blue','SP' => 'maroon','SNW' => 'olive','DD' => 'orange','DP' => 'navy','DNW' => 'black','SN' => 'red');
 
 $allordertypes = getAllOrderTypes();
 $allservers = getAllServers();
@@ -39,23 +29,26 @@ $allcurrencies = getAllCurrencies();
 $allsites = getAllSites();
 $ranksTranslation = getRanksTranslate();
 $serverName = array();
-$ordertypes = array();
-$ordertypesbyname = array();
-$ordertypesbyid = array();
+
 foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
 
+$ordertypes = array();
+$ordertypesbyname = array();
+$ordertypesbyid = array();
 foreach ($allordertypes as $item) {
     if ($item->APIname != '') {
         $ordertypes[$item->id] = $item->APIname;
     }
     $ordertypesbyname[$item->name] = $item->id;
-    $ordertypesbyid[$item->id]=$item->shortname;
+    $ordertypesbyid[$item->id] = $item->shortname;
 }
 
 $currentuser = getuserbyuserid($session->userid);
 $earnings = getSallaryByPlayer($session->userid);
+$maxearningsobject = paymentPerPlayer($session->userid);
+($maxearningsobject != '') ? $maxearnings = $maxearningsobject->value : $maxearnings = 0;
 
 if ($earnings != '') {
     $erningsrate = $earnings->profit / $earnings->days;
@@ -70,17 +63,17 @@ if (isset($_POST["saveorder"])) {
     $ordertype = $ordertypesbyname[$ordertypename];
     $currencytype = $_POST["currency"];
     $siteid = $_POST["sites"];
-    ($_POST["gamenumber"] != '') ? $gamenumber = $_POST["gamenumber"]: $gamenumber = 0;
+    ($_POST["gamenumber"] != '') ? $gamenumber = $_POST["gamenumber"] : $gamenumber = 0;
     $winnumber = $_POST["winnumber"];
     $playerusername = $_POST["playerusername"];
 
 
     $serverid = $_POST["optionsRadios"];
     $server = $serverName[$serverid];
-    $boostuser = str_replace(" ", "",$_POST["boostusername"]);
+    $boostuser = str_replace(" ", "", $_POST["boostusername"]);
     $currentsummoner = getSummonerDetails($server, $boostuser);
-    if($currentsummoner != false) {
-        if( in_array($ordertypes[$ordertype], $ordertypes)) {
+    if ($currentsummoner != false) {
+        if (in_array($ordertypes[$ordertype], $ordertypes)) {
             $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$ordertype]);
             $autopoints = $currentsummonerranking->leaguePoints;
             $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
@@ -108,6 +101,16 @@ if (isset($_POST["saveorder"])) {
     header("Location:index.php");
 
 }
+
+
+if(isset($_POST["orderpayment"])){
+    $paymentvalue = round($_POST["paymentvalue"]);
+    $newusertransaction = new usertransaction($session->userid,$paymentvalue, 1);
+    $newusertransaction->addtransactions();
+    header("Location:index.php");
+
+}
+
 
 include $headLayout;
 
@@ -217,9 +220,9 @@ include $headLayout;
                                     <div class="form-group order-line">
                                         <label>Sajt</label>
                                         <select class="form-control" name="sites" style="display:inline; width:250px;float:right;">
-                                            <?php foreach ($allsites as $item) {?>
-                                            <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
-                                            <?php }?>
+                                            <?php foreach ($allsites as $item) { ?>
+                                                <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
+                                            <?php } ?>
                                         </select>
                                     </div>
                                     <div class="form-group order-line">
@@ -267,7 +270,8 @@ include $headLayout;
                                         <div class="radio">
                                             <?php foreach ($allservers as $item) { ?>
                                                 <label>
-                                                    <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>" value="<?php echo $item->id ?>" <?php echo ($item->shortname == 'EUW') ? "checked" : ""?>>
+                                                    <input type="radio" name="optionsRadios" id="<?php echo $item->id ?>"
+                                                           value="<?php echo $item->id ?>" <?php echo ($item->shortname == 'EUW') ? "checked" : "" ?>>
                                                     <?php echo $item->name ?>
                                                 </label>
                                             <?php } ?>
@@ -276,7 +280,7 @@ include $headLayout;
                                     <div class="form-group order-line" id="jsstartdivision">
                                         <label>Početna divizija</label>
                                         <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison">
-                                                <option value=""></option>
+                                            <option value=""></option>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
                                             <?php } ?>
@@ -348,14 +352,18 @@ include $headLayout;
                         </tr>
                         <?php $i = 1;
                         foreach ($allorders as $item) {
-                            if ($item->playerid == $session->userid or in_array($session->userid, $adminarray)) { $currencyid=$item->currency; $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
+                            if ($item->playerid == $session->userid or in_array($session->userid, $adminarray)) {
+                                $currencyid = $item->currency;
+                                $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
                                 ?>
                                 <tr>
-                                    <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassordertype?>"><span title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </span></td>
+                                    <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassordertype ?>"><span
+                                            title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </span></td>
                                     <td style="line-height:32px;"><b><?php echo $item->name; ?></b></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server; ?></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo ($item->start != '') ? "$item->start ($item->points)" : ""; ?></td>
-                                    <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '') ? $item->cp : $item->ap; echo ($item->cr != "") ? "$item->cr ($tmppoint)" : ""; ?></td>
+                                    <td style="line-height:32px; text-align:center; width:70px;"><?php $tmppoint = ($item->cp != '') ? $item->cp : $item->ap;
+                                        echo ($item->cr != "") ? "$item->cr ($tmppoint)" : ""; ?></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo "$item->end"; ?></td>
                                     <td style="line-height:32px; text-align:center; width:94px;">N/A</td>
                                     <td style="line-height:32px; text-align:center; width:60px;"><span class="badge bg-yellow"><?php echo "$item->price $currenciessign[$currencyid]"; ?></span></td>
@@ -371,7 +379,7 @@ include $headLayout;
 
                                 <?php $i++;
                             }
-                        } ?>
+                        }?>
 
                     </table>
                 </div>
@@ -409,7 +417,7 @@ include $headLayout;
                 <div class="widget-user-header bg-aqua-active">
                     <h3 class="widget-user-username"><?php echo $currentuser->name ?></h3>
                     <h5 class="widget-user-desc"><?php echo $currentuser->username ?></h5>
-                    <div class="zarada"><?php echo "$currentearnings €" ?></div>
+                    <div class="zarada"><?php echo "$maxearnings Din." ?></div>
                 </div>
                 <div class="widget-user-image">
                     <img class="img-circle" src="dist/img/user1-128x128.jpg" alt="User Avatar">
@@ -443,26 +451,28 @@ include $headLayout;
                             <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#zakazi-isplatu">Zakaži isplatu</button>
                         </div>
                         <div class="modal fade" id="zakazi-isplatu">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title">Zakazivanje isplate</h4>
+                            <form method="post" action="<?php echo $_SERVER["PHP_SELF"] ?>">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title">Zakazivanje isplate</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><input class="form-control input-lg" type="number" name="paymentvalue" placeholder="" max="<?php echo "$maxearnings" ?>"></p>
+                                            <p>Maksimalan iznos koji možete podići je <?php echo "$maxearnings Din." ?></p>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Zatvori</button>
+                                            <button type="submit" class="btn btn-primary" name="orderpayment">Zakaži isplatu</button>
+                                        </div>
                                     </div>
-                                    <div class="modal-body">
-                                        <p><input class="form-control input-lg" type="number" placeholder=""></p>
-                                        <p>Maksimalan iznos koji možete podići je 47€</p>
-                                        <p>Iznos u dinarima: <b>5.804 Din</b></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Zatvori</button>
-                                        <button type="button" class="btn btn-primary">Zakaži isplatu</button>
-                                    </div>
+                                    <!-- /.modal-content -->
                                 </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
+                                <!-- /.modal-dialog -->
+                            </form>
                         </div>
                         <!-- /.col -->
                     </div>

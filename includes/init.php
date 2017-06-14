@@ -19,6 +19,7 @@ require INC_PATH . DS . 'apifunctions.php';
 require INC_PATH . DS . 'session.php';
 require INC_PATH . DS . 'summoners.php';
 require INC_PATH . DS . 'orders.php';
+require INC_PATH . DS . 'usertransaction.php';
 
 //CSS
 
@@ -30,3 +31,8 @@ $headLayout = LAYOUT_PATH.DS.'head.php';
 
 $salt = "$%klsakdlkakal#$$";
 $adminarray = array(1,3);
+$currenciessign = array(1 => "€", 2 => "$", 3 => "£");
+
+
+//Orders
+$ordertypeclass = array('SD' => 'blue','SP' => 'maroon','SNW' => 'olive','DD' => 'orange','DP' => 'navy','DNW' => 'black','SN' => 'red');

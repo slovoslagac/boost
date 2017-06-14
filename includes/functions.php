@@ -118,14 +118,16 @@ function getAllSites()
 function getDetailedOrders()
 {
     global $conn;
-    $sql = $conn->prepare("select p.name, p.server, r.shortname start, p.points, e.shortname as end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid, p.currency, p.ordertype, createtime, p.currentrate
+    $sql = $conn->prepare("select p.name, p.server, r.shortname start, p.points, e.shortname as end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid, p.currency, p.ordertype, createtime, p.currentrate, p.oid, p.playername
 from
 (
-select s.name, srv.shortname as server, o.startdiv , o.points, enddiv, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap, o.playerid, o.currency, o.ordertype, o.create_time createtime, c.currentrate
-from orders o, apisummoners s, servers srv, currency c
+select s.name, srv.shortname as server, o.startdiv , o.points, enddiv, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap,
+o.playerid, u.name playername, o.currency, o.ordertype, o.create_time createtime, c.currentrate, o.id oid
+from orders o, apisummoners s, servers srv, currency c, users u
 where o.boostusername = s.id
 and c.id = o.currency
 and o.server = srv.id
+and o.playerid = u.id
 ) p
 left join ranks cr on  p.currentdiv = cr.id
 left join ranks r on p.startdiv = r.id
@@ -154,9 +156,10 @@ function getRanksTranslate()
 function getSallaryByPlayer($userid)
 {
     global $conn;
-    $sql = $conn->prepare("select playerid, sum(round(price*0.6)) profit, case when sum(datediff(end_time, create_time)) > 0 then sum(datediff(end_time, create_time)) else 1 end days
-from orders
+    $sql = $conn->prepare("select playerid, sum(round(price*0.6*c.currentrate)) profit, case when sum(datediff(end_time, create_time)) > 0 then sum(datediff(end_time, create_time)) else 1 end days
+from orders o, currency c
 where status = 1
+and o.currency = c.id
 and playerid = :uid
 group by playerid");
     $sql->bindParam(":uid", $userid);
@@ -168,14 +171,29 @@ group by playerid");
 function paymentPerPlayer($userid)
 {
     global $conn;
-    $sql = $conn->prepare("select playerid, sum(price * c.currentrate) value
+    $sql = $conn->prepare("select playerid, sum(value) value
+from
+(
+select playerid, sum(round(price * c.currentrate *0.6)) value
 from orders o, currency c
 where o.currency = c.id
 and o.status = 1
-and playerid = :uid
-group by o.playerid");
+union all
+select userid playerid, round(value * -1) value
+from usertransactions
+where status <> 3) a
+where a.playerid = :uid
+group by playerid");
     $sql->bindParam(":uid", $userid);
     $sql->execute();
     $result = $sql->fetch(PDO::FETCH_OBJ);
     return $result;
+}
+
+
+function verifyorder($id){
+    global $conn;
+    $sql = $conn->prepare("update orders set status = 1 where id = :oid");
+    $sql->bindParam(":oid", $id);
+    $sql->execute();
 }

@@ -1,1 +1,2 @@
 14.06.2017 14:12:23 | Skidanje detalja usera : eun1, Chumpitas, {"id":57037709,"accountId":219168943,"name":"Chumpitas","profileIconId":26,"revisionDate":1496415720000,"summonerLevel":10}
+14.06.2017 20:07:43 | Skidanje detalja usera : eun1, Chumpitas, {"id":57037709,"accountId":219168943,"name":"Chumpitas","profileIconId":26,"revisionDate":1496415720000,"summonerLevel":10}
