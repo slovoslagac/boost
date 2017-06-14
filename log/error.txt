@@ -36,3 +36,4 @@ Stack trace:
 #0 C:\XAMPP\htdocs\boost\includes\orders.php(67): PDOStatement->execute()
 #1 C:\XAMPP\htdocs\boost\index.php(73): orders->addorder()
 #2 {main}
+14.06.2017 14:11:57 | Problem sa dohvatanjem podataka sa API-a :  euw1, Chumpitas,

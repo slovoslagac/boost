@@ -20,7 +20,7 @@ function getSummonerDetails($server, $summonername)
         $newsummoner = new summoners($playerDecoded->id, $playerDecoded->accountId, $playerDecoded->name, $playerDecoded->profileIconId, $playerDecoded->revisionDate, $playerDecoded->summonerLevel);
         $boostuser = $newsummoner->checkIfSummonerExists();
         $serbouser = serialize($playerDecoded);
-        logAction("Skidanje detalja usera", "$server, $summonername, $fullData", $summonername . '.txt');
+        logAction("Skidanje detalja usera", "$server, $summonername, $fullData", $summonername . '.txt', "API");
         if ($boostuser == '') {
             $newsummoner->addNewSummoner();
             $boostuser = $newsummoner->checkIfSummonerExists();
@@ -40,7 +40,7 @@ function getSummonerRanking($server, $summonerid, $queuetype)
 {
     $fullData = file_get_contents("https://$server.api.riotgames.com/lol/league/v3/positions/by-summoner/$summonerid?api_key=d3695a41-c367-41e6-9abf-cf6a90ea8d6d");
     $playerDecoded = json_decode($fullData);
-    logAction("Skidanje pozicija usera", "$server, $summonerid, $queuetype, $fullData", $summonerid . '.txt');
+    logAction("Skidanje pozicija usera", "$server, $summonerid, $queuetype, $fullData", $summonerid . '.txt', "API");
     foreach ($playerDecoded as $item) {
         if ($item->queueType == $queuetype) {
             $playerDetails = $item;

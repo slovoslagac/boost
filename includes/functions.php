@@ -22,9 +22,10 @@ if (!function_exists('password_verify')) {
     }
 }
 
-function logAction($action, $message, $file = 'log.txt')
+function logAction($action, $message, $file = 'log.txt', $file_loc = '')
 {
-    $logfile = SITE_ROOT . DS . 'log' . DS . $file;
+    ($file_loc == '') ? $logfile = SITE_ROOT . DS . 'log' . DS . $file : $logfile = SITE_ROOT . DS . 'log' . DS . $file_loc . DS . $file;
+
 
     if ($handle = fopen($logfile, 'a')) {
         $timestamp = strftime("%d.%m.%Y %H:%M:%S", time());
@@ -123,6 +124,7 @@ from
 select s.name, srv.shortname as server, o.startdiv , o.points, enddiv, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap, o.playerid, o.currency, o.ordertype, o.create_time createtime, c.currentrate
 from orders o, apisummoners s, servers srv, currency c
 where o.boostusername = s.id
+and c.id = o.currency
 and o.server = srv.id
 ) p
 left join ranks cr on  p.currentdiv = cr.id
