@@ -12,7 +12,7 @@ function getSummonerDetails($server, $summonername)
     $file_headers = @get_headers($page);
 
     if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
-        logAction("Problem sa dohvatanjem podataka sa API-a", " $server, $summonername,", 'error.txt');
+        logAction("Nije pronadjen igrac na serveru", " $server, $summonername,", 'error.txt');
         return false;
     } else {
         $fullData = file_get_contents($page);

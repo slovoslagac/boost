@@ -1,1 +1,4 @@
 14.06.2017 23:20:57 | Skidanje detalja usera : euw1, MisterNixxX, {"id":80427490,"accountId":224874749,"name":"MisterNixxX","profileIconId":7,"revisionDate":1496738278000,"summonerLevel":30}
+15.06.2017 12:01:02 | Skidanje detalja usera : euw1, misternixxx, {"id":80427490,"accountId":224874749,"name":"MisterNixxX","profileIconId":7,"revisionDate":1496738278000,"summonerLevel":30}
+15.06.2017 12:05:27 | Skidanje detalja usera : euw1, misternixxx, {"id":80427490,"accountId":224874749,"name":"MisterNixxX","profileIconId":7,"revisionDate":1496738278000,"summonerLevel":30}
+15.06.2017 12:27:39 | Skidanje detalja usera : euw1, misternixxx, {"id":80427490,"accountId":224874749,"name":"MisterNixxX","profileIconId":7,"revisionDate":1496738278000,"summonerLevel":30}

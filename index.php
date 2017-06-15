@@ -66,8 +66,6 @@ if (isset($_POST["saveorder"])) {
     ($_POST["gamenumber"] != '') ? $gamenumber = $_POST["gamenumber"] : $gamenumber = 0;
     $winnumber = $_POST["winnumber"];
     $playerusername = $_POST["playerusername"];
-
-
     $serverid = $_POST["optionsRadios"];
     $server = $serverName[$serverid];
     $boostuser = str_replace(" ", "", $_POST["boostusername"]);
@@ -94,18 +92,28 @@ if (isset($_POST["saveorder"])) {
         } catch (Exception $e) {
             logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber, $e", 'error.txt');
         }
+
+
+        header("Location:index.php");
+
+
+    } else {
+        echo '<script language="JavaScript"> alert("Igrac : ' . $boostuser . ' nije pronadjen na serveru : ' . $server . '");</script>';
+//        echo '<script language="JavaScript"> alert("Igrac : ' . $boostuser . ' nije pronadjen na serveru : ' . $server . '"); setTimeout(function(){ location.reload(); }, 3000); </script>';
+//
+//        sleep(5);
+//        header("Location:index.php");
+
     }
 
-    unset($currentorder, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber);
 
-    header("Location:index.php");
 
 }
 
 
-if(isset($_POST["orderpayment"])){
+if (isset($_POST["orderpayment"])) {
     $paymentvalue = round($_POST["paymentvalue"]);
-    $newusertransaction = new usertransaction($session->userid,$paymentvalue, 1);
+    $newusertransaction = new usertransaction($session->userid, $paymentvalue, 1);
     $newusertransaction->addtransactions();
     header("Location:index.php");
 
@@ -288,7 +296,8 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jslppoints">
                                         <label for="exampleInputEmail1">Broj LP poena</label>
-                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku"
+                                               style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jsenddivision">
                                         <label>Krajnja divizija</label>
@@ -301,11 +310,13 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsgejnumber" style="display: none;">
                                         <label for="exampleInputEmail1">Broj gejmova</label>
-                                        <input type="number" class="form-control" id="gamenumber" name="gamenumber" placeholder="Unesi broj traženih gejmova" style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="gamenumber" name="gamenumber" placeholder="Unesi broj traženih gejmova"
+                                               style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jswinnumber" style="display: none;">
                                         <label for="exampleInputEmail1">Broj pobeda</label>
-                                        <input type="number" class="form-control" id="winnumber" name="winnumber" placeholder="Unesi broj traženih pobeda" style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="winnumber" name="winnumber" placeholder="Unesi broj traženih pobeda"
+                                               style="display:inline; width:250px; float:right">
                                     </div>
                                     <div class="form-group order-line" id="jsprice">
                                         <label for="exampleInputEmail1">Cena ordera</label>
@@ -379,7 +390,7 @@ include $headLayout;
 
                                 <?php $i++;
                             }
-                        }?>
+                        } ?>
 
                     </table>
                 </div>
@@ -442,7 +453,7 @@ include $headLayout;
                         <!-- /.col -->
                         <div class="col-sm-4">
                             <div class="description-block">
-                                <h5 class="description-header"><?php echo "$erningsrate €/dan" ?></h5>
+                                <h5 class="description-header"><?php echo "$erningsrate Din/dan" ?></h5>
                                 <span class="description-text">ZARADA</span>
                             </div>
                             <!-- /.description-block -->
@@ -474,6 +485,7 @@ include $headLayout;
                                 <!-- /.modal-dialog -->
                             </form>
                         </div>
+
                         <!-- /.col -->
                     </div>
                     <!-- /.row -->
@@ -532,10 +544,12 @@ include $headLayout;
                                     <h3 class="timeline-header"><a href="#">Dado</a>: Rezervacije</h3>
 
                                     <div class="timeline-body">
-                                        Radi bolje organizacije i što bolje iskorišćenosti računara od danas je obavezno rezervisati termin u kojem želite da boostujete. Postavljene rezervacije su
+                                        Radi bolje organizacije i što bolje iskorišćenosti računara od danas je obavezno rezervisati termin u kojem želite da boostujete. Postavljene
+                                        rezervacije su
                                         obavezne i
                                         moraju se poštovati. Booster bez rezervacije može zauzeti samo kompjuter koji nije rezervisan.<br><br>
-                                        Booster koji rezerviše računar, a ne ispoštuje rezervaciju, gubiće pravo da rezerviše računar. Zakazana rezervacija se poštuje sa najviše 15 minuta zakašnjenja,
+                                        Booster koji rezerviše računar, a ne ispoštuje rezervaciju, gubiće pravo da rezerviše računar. Zakazana rezervacija se poštuje sa najviše 15 minuta
+                                        zakašnjenja,
                                         nakon
                                         toga je računar slobodan.
                                     </div>
@@ -808,5 +822,6 @@ include $headLayout;
     }
 
 </script>
+
 </body>
 </html>
