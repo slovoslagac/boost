@@ -7,7 +7,7 @@ if (!$session->isLoggedIn() and $session != '') {
 if (!in_array($session->userid, $adminarray)) {
     redirectTo("index.php");
 }
-
+$currentuser = getuserbyuserid($session->userid);
 $allordertypes = getAllOrderTypes();
 $allorders = getDetailedOrders();
 $ordertypes = array();
@@ -24,6 +24,8 @@ foreach ($allordertypes as $item) {
 if(isset($_POST['verify'])){
     $verifyid=$_POST["verify"];
     verifyorder($verifyid);
+    $slackmessage = "$currentuser->username je verifikovao order br : $verifyid";
+    sendSlackFinancialInfo($slackmessage, $financialChanel);
     header("Location:adminverif.php");
 }
 

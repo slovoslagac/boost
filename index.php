@@ -115,6 +115,9 @@ if (isset($_POST["orderpayment"])) {
     $paymentvalue = round($_POST["paymentvalue"]);
     $newusertransaction = new usertransaction($session->userid, $paymentvalue, 1);
     $newusertransaction->addtransactions();
+    $slackmessage = "Igrač : $currentuser->username je zatrazio isplatu $paymentvalue dinara";
+    sendSlackFinancialInfo($slackmessage, $financialChanel);
+
     header("Location:index.php");
 
 }
