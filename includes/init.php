@@ -39,3 +39,4 @@ $financialChanel = 'https://hooks.slack.com/services/T5UTDFZ9T/B5UNTJYBD/pBi4AVW
 
 //Orders
 $ordertypeclass = array('SD' => 'blue', 'SP' => 'maroon', 'SNW' => 'olive', 'DD' => 'orange', 'DP' => 'navy', 'DNW' => 'black', 'SN' => 'red');
+$payinglocation = array(1=>'Dado', 2=>'eSportsArena');
