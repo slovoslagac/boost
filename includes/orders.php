@@ -49,7 +49,7 @@ class orders
     public function addorder()
     {
         global $conn;
-        $sql = $conn->prepare("insert into orders (boostusername,server,startdiv, currentdiv,enddiv,points,price,status,playerid, autopoints,ordertype, currency, siteid, gamenumber, winnumber,playerusername  )
+        $sql = $conn->prepare("insert into orders (boostusername,server,startdiv, currentdiv,enddiv,points,price,status,playerid, autopoints,boosttypes, currency, siteid, gamenumber, winnumber,playerusername  )
                                 values (:bu,:sr,:sd,:cd,:ed,:po,:pr,:st,:pl,:ap, :ot, :cr, :sid, :gn, :wn, :pun)");
         $sql->bindParam(":bu", $this->summonerid);
         $sql->bindParam(":sr", $this->serverid);

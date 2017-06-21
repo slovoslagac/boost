@@ -87,10 +87,10 @@ function getAllRanks()
     return $result;
 }
 
-function getAllOrderTypes()
+function getAllBoostTypes()
 {
     global $conn;
-    $sql = $conn->prepare("select * from ordertypes order by id");
+    $sql = $conn->prepare("select * from boosttypes order by id");
     $sql->execute();
     $result = $sql->fetchAll(PDO::FETCH_OBJ);
     return $result;
@@ -118,11 +118,11 @@ function getAllSites()
 function getDetailedOrders()
 {
     global $conn;
-    $sql = $conn->prepare("select p.name, p.server, r.shortname start, p.points, e.shortname as end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid, p.currency, p.ordertype, createtime, p.currentrate, p.oid, p.playername
+    $sql = $conn->prepare("select p.name, p.server, r.shortname start, p.points, e.shortname as end, p.price, p.profit, p.status, cr.shortname cr, p.cp, p.ap, p.playerid, p.currency, p.boosttypes, createtime, p.currentrate, p.oid, p.playername
 from
 (
 select s.name, srv.shortname as server, o.startdiv , o.points, enddiv, o.price as price, round(0.6*o.price) as profit, o.status, currentdiv, o.currentpoints cp, o.autopoints ap,
-o.playerid, u.name playername, o.currency, o.ordertype, o.create_time createtime, c.currentrate, o.id oid
+o.playerid, u.name playername, o.currency, o.boosttypes, o.create_time createtime, c.currentrate, o.id oid
 from orders o, apisummoners s, servers srv, currency c, users u
 where o.boostusername = s.id
 and c.id = o.currency

@@ -102,3 +102,6 @@ Stack trace:
 15.06.2017 13:31:54 | Nije pronadjen igrac na serveru :  na1, misternixxx,
 15.06.2017 13:33:24 | Nije pronadjen igrac na serveru :  na1, misternixxx,
 15.06.2017 13:33:33 | Nije pronadjen igrac na serveru :  na1, misternixxx,
+21.06.2017 12:35:21 | Nije pronadjen igrac na serveru :  euw1, Chumpitas,
+21.06.2017 13:11:30 | Nije pronadjen igrac na serveru :  euw1, Chumpitas,
+21.06.2017 13:12:09 | Nije pronadjen igrac na serveru :  euw1, Chumpitas,

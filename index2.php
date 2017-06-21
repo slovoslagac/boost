@@ -7,7 +7,7 @@ if (!$session->isLoggedIn()) {
 
 $addminarray = array(2);
 
-$allordertypes = getAllOrderTypes();
+$allordertypes = getAllBoostTypes();
 $allservers = getAllServers();
 $allranks = getAllRanks();
 $allorders = getDetailedOrders();

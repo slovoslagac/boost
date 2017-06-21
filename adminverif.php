@@ -8,7 +8,7 @@ if (!in_array($session->userid, $adminarray)) {
     redirectTo("index.php");
 }
 $currentuser = getuserbyuserid($session->userid);
-$allordertypes = getAllOrderTypes();
+$allordertypes = getAllBoostTypes();
 $allorders = getDetailedOrders();
 $ordertypes = array();
 $ordertypesbyname = array();
@@ -149,7 +149,7 @@ include $headLayout;
                             </tr>
                             <?php foreach ($allorders as $item) {
                                 $currencyid = $item->currency;
-                                $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
+                                $bgclassordertype = $boosttypeclass[$ordertypesbyid[$item->ordertype]];
                                 ?>
                                 <tr style="background:#f7fafc;">
                                     <td><?php echo $item->oid?></td>

@@ -1,0 +1,3 @@
+21.06.2017 13:19:25 | Skidanje detalja usera : eun1, Pera, {"id":48203579,"accountId":211683538,"name":"Pera","profileIconId":691,"revisionDate":1495776371000,"summonerLevel":30}
+21.06.2017 13:19:44 | Skidanje detalja usera : na1, Pera, {"id":22767454,"accountId":36671116,"name":"Pera","profileIconId":4,"revisionDate":1495784206000,"summonerLevel":2}
+21.06.2017 13:20:32 | Skidanje detalja usera : euw1, Pera, {"id":24151315,"accountId":28557397,"name":"Pera","profileIconId":1435,"revisionDate":1496170218000,"summonerLevel":30}

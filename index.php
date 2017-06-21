@@ -21,7 +21,7 @@ function getUserIP()
     return $ip;
 }
 
-$allordertypes = getAllOrderTypes();
+$allboosttypes = getAllBoostTypes();
 $allservers = getAllServers();
 $allranks = getAllRanks();
 $allorders = getDetailedOrders();
@@ -34,15 +34,15 @@ foreach ($allservers as $item) {
     $serverName[$item->id] = $item->shortname2;
 }
 
-$ordertypes = array();
-$ordertypesbyname = array();
-$ordertypesbyid = array();
-foreach ($allordertypes as $item) {
+$boosttypes = array();
+$boosttypesbyname = array();
+$boosttypesbyid = array();
+foreach ($allboosttypes as $item) {
     if ($item->APIname != '') {
-        $ordertypes[$item->id] = $item->APIname;
+        $boosttypes[$item->id] = $item->APIname;
     }
-    $ordertypesbyname[$item->name] = $item->id;
-    $ordertypesbyid[$item->id] = $item->shortname;
+    $boosttypesbyname[$item->name] = $item->id;
+    $boosttypesbyid[$item->id] = $item->shortname;
 }
 
 $currentuser = getuserbyuserid($session->userid);
@@ -59,8 +59,8 @@ if ($earnings != '') {
 }
 //
 if (isset($_POST["saveorder"])) {
-    $ordertypename = $_POST["soloduo"] . ' ' . $_POST["boost"];
-    $ordertype = $ordertypesbyname[$ordertypename];
+    $boosttypename = $_POST["soloduo"] . ' ' . $_POST["boost"];
+    $boosttype = $boosttypesbyname[$boosttypename];
     $currencytype = $_POST["currency"];
     $siteid = $_POST["sites"];
     ($_POST["gamenumber"] != '') ? $gamenumber = $_POST["gamenumber"] : $gamenumber = 0;
@@ -71,8 +71,8 @@ if (isset($_POST["saveorder"])) {
     $boostuser = str_replace(" ", "", $_POST["boostusername"]);
     $currentsummoner = getSummonerDetails($server, $boostuser);
     if ($currentsummoner != false) {
-        if (in_array($ordertypes[$ordertype], $ordertypes)) {
-            $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $ordertypes[$ordertype]);
+        if (in_array($boosttypes[$boosttype], $boosttypes)) {
+            $currentsummonerranking = getSummonerRanking($server, $currentsummoner->summonerid, $boosttypes[$boosttype]);
             $autopoints = $currentsummonerranking->leaguePoints;
             $tmpvar = $currentsummonerranking->tier . $currentsummonerranking->rank;
             $currentdiv = $ranksTranslation[$tmpvar];
@@ -86,11 +86,11 @@ if (isset($_POST["saveorder"])) {
         $price = $_POST["boostprice"];
 
         try {
-            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber, $playerusername);
+            $currentorder = new orders($session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $boosttype, $currencytype, $siteid, $gamenumber, $winnumber, $playerusername);
             $currentorder->addorder();
 
         } catch (Exception $e) {
-            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $ordertype, $currencytype, $siteid, $gamenumber, $winnumber, $e", 'error.txt');
+            logAction("Problem sa kreiranjem ponude", "$session->userid, $currentsummoner->id, $serverid, $startdiv, $enddiv, $lppoints, $price, $currentdiv, $autopoints, $boosttype, $currencytype, $siteid, $gamenumber, $winnumber, $e", 'error.txt');
         }
 
 
@@ -105,7 +105,6 @@ if (isset($_POST["saveorder"])) {
 //        header("Location:index.php");
 
     }
-
 
 
 }
@@ -162,7 +161,6 @@ include $headLayout;
                             <!-- The user image in the menu -->
                             <li class="user-header">
                                 <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-
                                 <p>
                                     <?php echo $currentuser->name ?> - Booster
                                     <small>Member since <?php $new_datetime = DateTime::createFromFormat("Y-m-d H:i:s", $currentuser->create_time);
@@ -273,7 +271,7 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsplayerCustomerName">
                                         <label for="exampleInputEmail1">Summoner name mušterije</label>
-                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije"
+                                        <input type="text" class="form-control" id="boostusername" name="boostusername" placeholder="Unesi username mušterije " required
                                                style="float:right; width:250px;">
                                     </div>
                                     <div class="form-group order-line" id="jsserver">
@@ -290,7 +288,7 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jsstartdivision">
                                         <label>Početna divizija</label>
-                                        <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison">
+                                        <select class="form-control" style="float:right; width:250px;" name="startdivison" id="startdivison" required>
                                             <option value=""></option>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
@@ -299,12 +297,11 @@ include $headLayout;
                                     </div>
                                     <div class="form-group order-line" id="jslppoints">
                                         <label for="exampleInputEmail1">Broj LP poena</label>
-                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku"
-                                               style="display:inline; width:250px; float:right">
+                                        <input type="number" class="form-control" id="lppoint" name="lppoint" placeholder="Unesi broj LP poena na početku" style="display:inline; width:250px; float:right" required>
                                     </div>
                                     <div class="form-group order-line" id="jsenddivision">
                                         <label>Krajnja divizija</label>
-                                        <select class="form-control" name="enddivision" style="display:inline; width:250px;float:right;">
+                                        <select class="form-control" name="enddivision" id="enddivision" style="display:inline; width:250px;float:right;" required>
                                             <option value=""></option>
                                             <?php foreach ($allranks as $item) { ?>
                                                 <option value="<?php echo $item->id ?>"><?php echo $item->name ?></option>
@@ -327,7 +324,7 @@ include $headLayout;
                                             <div class="radio">
                                                 <?php foreach ($allcurrencies as $item) { ?>
                                                     <label>
-                                                        <input type="radio" name="currency" id="<?php echo strtolower($item->name) ?>" value="<?php echo $item->id ?>" checked>
+                                                        <input type="radio" name="currency" id="<?php echo strtolower($item->name) ?>" value="<?php echo $item->id ?>" <?php echo ($item->name == "EUR")?"checked" :""?>>
                                                         <?php echo $item->name ?>
                                                     </label>
 
@@ -335,7 +332,7 @@ include $headLayout;
                                                 <?php } ?>
                                             </div>
                                         </div>
-                                        <input type="number" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" style="float:right; width:250px;">
+                                        <input type="number" class="form-control" id="boostprice" name="boostprice" placeholder="Unesi cenu boosta" style="float:right; width:250px;" required>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -368,11 +365,11 @@ include $headLayout;
                         foreach ($allorders as $item) {
                             if ($item->playerid == $session->userid or in_array($session->userid, $adminarray)) {
                                 $currencyid = $item->currency;
-                                $bgclassordertype = $ordertypeclass[$ordertypesbyid[$item->ordertype]];
+                                $bgclassboosttype = $boosttypeclass[$boosttypesbyid[$item->boosttypes]];
                                 ?>
                                 <tr>
-                                    <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassordertype ?>"><span
-                                            title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </span></td>
+                                    <td style="line-height:32px; text-align:center; width:20px;" class="bg-<?php echo $bgclassboosttype ?>"><span
+                                            title="Solo Net Wins"><?php echo $boosttypesbyid[$item->boosttypes] ?> </span></td>
                                     <td style="line-height:32px;"><b><?php echo $item->name; ?></b></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo $item->server; ?></td>
                                     <td style="line-height:32px; text-align:center; width:70px;"><?php echo ($item->start != '') ? "$item->start ($item->points)" : ""; ?></td>
@@ -763,6 +760,11 @@ include $headLayout;
                 document.getElementById("jsenddivision").style.display = "";
                 document.getElementById("jsgejnumber").style.display = "none";
                 document.getElementById("jswinnumber").style.display = "none";
+                document.getElementById("startdivison").required = true;
+                document.getElementById("lppoint").required = true;
+                document.getElementById("enddivision").required = true;
+                document.getElementById("gamenumber").required = false;
+                document.getElementById("winnumber").required = false;
                 defValue(2);
                 break;
             case 2:
@@ -771,6 +773,11 @@ include $headLayout;
                 document.getElementById("jsenddivision").style.display = "none";
                 document.getElementById("jsgejnumber").style.display = "";
                 document.getElementById("jswinnumber").style.display = "";
+                document.getElementById("startdivison").required = false;
+                document.getElementById("lppoint").required = false;
+                document.getElementById("enddivision").required = false;
+                document.getElementById("gamenumber").required = true;
+                document.getElementById("winnumber").required = true;
                 defValue(2);
                 break;
             case 3:
@@ -779,6 +786,11 @@ include $headLayout;
                 document.getElementById("jsenddivision").style.display = "none";
                 document.getElementById("jsgejnumber").style.display = "none";
                 document.getElementById("jswinnumber").style.display = "";
+                document.getElementById("startdivison").required = false;
+                document.getElementById("lppoint").required = false;
+                document.getElementById("enddivision").required = false;
+                document.getElementById("gamenumber").required = false;
+                document.getElementById("winnumber").required = true;
                 defValue(2);
                 break;
             case 4:
@@ -788,6 +800,11 @@ include $headLayout;
                     document.getElementById("jsenddivision").style.display = "none";
                     document.getElementById("jsgejnumber").style.display = "none";
                     document.getElementById("jswinnumber").style.display = "none";
+                    document.getElementById("startdivison").required = false;
+                    document.getElementById("lppoint").required = false;
+                    document.getElementById("enddivision").required = false;
+                    document.getElementById("gamenumber").required = false;
+                    document.getElementById("winnumber").required = false;
                     defValue(1);
                 } else {
                     document.getElementById("jsstartdivision").style.display = "none";
@@ -795,6 +812,11 @@ include $headLayout;
                     document.getElementById("jsenddivision").style.display = "none";
                     document.getElementById("jsgejnumber").style.display = "";
                     document.getElementById("jswinnumber").style.display = "";
+                    document.getElementById("startdivison").required = false;
+                    document.getElementById("lppoint").required = false;
+                    document.getElementById("enddivision").required = false;
+                    document.getElementById("gamenumber").required = true;
+                    document.getElementById("winnumber").required = true;
                     defValue(2);
                 }
                 break;
@@ -806,6 +828,11 @@ include $headLayout;
                     document.getElementById("jsenddivision").style.display = "none";
                     document.getElementById("jsgejnumber").style.display = "";
                     document.getElementById("jswinnumber").style.display = "";
+                    document.getElementById("startdivison").required = false;
+                    document.getElementById("lppoints").required = false;
+                    document.getElementById("enddivision").required = false;
+                    document.getElementById("gamenumber").required = true;
+                    document.getElementById("winnumber").required = true;
                     defValue(2);
                 }
                 break;
@@ -816,6 +843,11 @@ include $headLayout;
                     document.getElementById("jsenddivision").style.display = "none";
                     document.getElementById("jsgejnumber").style.display = "none";
                     document.getElementById("jswinnumber").style.display = "none";
+                    document.getElementById("startdivison").required = false;
+                    document.getElementById("lppoints").required = false;
+                    document.getElementById("enddivision").required = false;
+                    document.getElementById("gamenumber").required = false;
+                    document.getElementById("winnumber").required = false;
                     defValue(1);
                 } else {
                     document.getElementById("jsplayerSummonerName").style.display = "";
