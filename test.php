@@ -7,10 +7,14 @@
  */
 include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 
+$allorders = getDetailedOrders();
 
+$i = 0;
+foreach ($allorders as $item) {
+    $i++;
+    ($i == 5) ? sleep(10) : '';
+    if ($item->status != 0) {
+        var_dump($item);
+    }
 
-$page = "https://'na1'.api.riotgames.com/lol/summoner/v3/summoners/by-name/misternixxx?api_key=d3695a41-c367-41e6-9abf-cf6a90ea8d6d";
-$fullData = file_get_contents($page);
-
-echo $fullData;
-
+}

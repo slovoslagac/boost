@@ -7,18 +7,20 @@ if (!$session->isLoggedIn() and $session != '') {
 if (!in_array($session->userid, $adminarray)) {
     redirectTo("index.php");
 }
+
+$allboosttypes = getAllBoostTypes();
 $currentuser = getuserbyuserid($session->userid);
 $allordertypes = getAllBoostTypes();
 $allorders = getDetailedOrders();
 $ordertypes = array();
 $ordertypesbyname = array();
 $ordertypesbyid = array();
-foreach ($allordertypes as $item) {
+foreach ($allboosttypes as $item) {
     if ($item->APIname != '') {
-        $ordertypes[$item->id] = $item->APIname;
+        $boosttypes[$item->id] = $item->APIname;
     }
-    $ordertypesbyname[$item->name] = $item->id;
-    $ordertypesbyid[$item->id] = $item->shortname;
+    $boosttypesbyname[$item->name] = $item->id;
+    $boosttypesbyid[$item->id] = $item->shortname;
 }
 
 if(isset($_POST['verify'])){
@@ -149,12 +151,12 @@ include $headLayout;
                             </tr>
                             <?php foreach ($allorders as $item) {
                                 $currencyid = $item->currency;
-                                $bgclassordertype = $boosttypeclass[$ordertypesbyid[$item->ordertype]];
+                                $bgclassboosttype = $boosttypeclass[$boosttypesbyid[$item->boosttypes]];
                                 ?>
                                 <tr style="background:#f7fafc;">
                                     <td><?php echo $item->oid?></td>
                                     <input type="hidden" name="oid" value="<?php echo $item->oid?>">
-                                    <td style="text-align:center;" class="bg-<?php echo $bgclassordertype ?>" title="Solo Net Wins"><?php echo $ordertypesbyid[$item->ordertype] ?> </td>
+                                    <td style="text-align:center;" class="bg-<?php echo $bgclassboosttype ?>" title="Solo Net Wins"><?php echo $boosttypesbyid[$item->boosttypes] ?></td>
                                     <td><b><?php echo $item->name; ?></b></td>
                                     <td><?php echo $item->playername; ?></td>
                                     <td><?php echo date('d.m.Y', strtotime($item->createtime)); ?></td>
