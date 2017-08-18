@@ -19,7 +19,7 @@ if (isset($_POST["verify"])) {
         sendSlackFinancialInfo($slackmessage, $financialChanel);
         header("Location:payout.php");
     } catch (Exception $e) {
-        logAction("Neuspelo odobravanje isplate", "id -$transactionid,location - $paidlocationid, object - $transaction", 'error.txt');
+        logAction("Neuspelo odobravanje isplate", "id - $transactionid,location - $paidlocationid, object - $transaction", 'error.txt');
     }
 }
 
@@ -29,7 +29,7 @@ if (isset($_POST["paid"])) {
     $paidlocationname = $payinglocation[$paidlocationid];
     $paymentvalue = $_POST["payment$transactionid"];
     $playername = $_POST["playername$transactionid"];
-    $slackmessage = "$currentuser->username je ispatio igraču $playername, transakciju br : $transactionid u vrednosti od $paymentvalue. Način isplate : $paidlocationname";
+    $slackmessage = "$currentuser->username je isplatio igraču $playername, transakciju br : $transactionid u vrednosti od $paymentvalue. Način isplate : $paidlocationname";
     try {
         logAction("Isplaceno", "id -$transactionid, location - $paidlocationid, iznos - $paymentvalue, isplatio $currentuser->username ($session->userid)", 'transactions.txt');
         $transaction->paidTransaction($transactionid);

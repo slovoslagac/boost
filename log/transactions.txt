@@ -1,0 +1,2 @@
+18.08.2017 14:32:58 | Odobrena isplata : id -19, location - 1, iznos - 32 (21), isplatio proske (1)
+18.08.2017 14:33:02 | Isplaceno : id -19, location - 1, iznos - 32 (21), isplatio proske (1)

@@ -6,9 +6,12 @@
  * Time: 12:43
  */
 
+$apiKey = 'RGAPI-b029a319-dcff-4cfd-b92b-981d5fa89f9c';
+
 function getSummonerDetails($server, $summonername)
 {
-    $page = "https://$server.api.riotgames.com/lol/summoner/v3/summoners/by-name/$summonername?api_key=d3695a41-c367-41e6-9abf-cf6a90ea8d6d";
+    global $apiKey;
+    $page = "https://$server.api.riotgames.com/lol/summoner/v3/summoners/by-name/$summonername?api_key=$apiKey";
     $file_headers = @get_headers($page);
 
     if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
@@ -38,7 +41,8 @@ function getSummonerDetails($server, $summonername)
 
 function getSummonerRanking($server, $summonerid, $queuetype)
 {
-    $fullData = file_get_contents("https://$server.api.riotgames.com/lol/league/v3/positions/by-summoner/$summonerid?api_key=d3695a41-c367-41e6-9abf-cf6a90ea8d6d");
+    global $apiKey;
+    $fullData = file_get_contents("https://$server.api.riotgames.com/lol/league/v3/positions/by-summoner/$summonerid?api_key=$apiKey");
     $playerDecoded = json_decode($fullData);
     logAction("Skidanje pozicija usera", "$server, $summonerid, $queuetype, $fullData", $summonerid . '.txt', "API");
     foreach ($playerDecoded as $item) {

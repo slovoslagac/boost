@@ -12,9 +12,9 @@ $allorders = getDetailedOrders();
 $i = 0;
 foreach ($allorders as $item) {
     $i++;
-    ($i == 5) ? sleep(10) : '';
+//    ($i == 5) ? sleep(10) : '';
     if ($item->status != 0) {
         var_dump($item);
     }
-
+//
 }

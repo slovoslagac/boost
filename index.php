@@ -4,6 +4,7 @@ include(join(DIRECTORY_SEPARATOR, array('includes', 'init.php')));
 if (!$session->isLoggedIn() and $session != '') {
     redirectTo("login.php");
 }
+
 function getUserIP()
 {
     $client = @$_SERVER['HTTP_CLIENT_IP'];
